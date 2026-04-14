@@ -1,0 +1,9 @@
+{
+  "blocked_domains": [
+    "badsite.example",
+    "malware.example"
+  ],
+  "allowed_patterns": [
+    "*.example"
+  ]
+}

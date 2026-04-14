@@ -1,0 +1,4 @@
+{
+  "device-1": "bootstrap-secret-abc123",
+  "device-2": "bootstrap-secret-xyz789"
+}

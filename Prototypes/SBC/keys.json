@@ -1,0 +1,7 @@
+{
+  "keys": [
+    "test-api-key-CHANGE-THIS-abc123"
+  ],
+  "admin_password": "admin",
+  "note": "Replace admin_password and keys before real use"
+}

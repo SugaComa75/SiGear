@@ -1,0 +1,155 @@
+<!--
+  SPDX-License-Identifier: AGPL-3.0-only
+  Copyright (C) 2026 SiGear
+  See LICENSE-AGPLv3.txt in project root for full license text.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SiGear SBC Mock</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;margin:20px}
+    .card{border:1px solid #ddd;padding:12px;margin-bottom:12px;border-radius:6px}
+    input[type=text]{padding:6px;width:300px}
+    button{padding:6px 10px}
+    pre{background:#f7f7f7;padding:8px}
+  </style>
+</head>
+<body>
+  <h1>SiGear SBC Mock</h1>
+  <div class="card">
+    <h2>Check Domain (DNS policy)</h2>
+    <input id="domain" placeholder="example.com">
+    <select id="deviceSelect"></select>
+    <button onclick="checkDomain()">Check</button>
+    <div id="result"></div>
+  </div>
+
+  <div class="card">
+    <h2>SOS (mock)</h2>
+    <button onclick="sendSOS()">Send SOS</button>
+    <div id="sosResult"></div>
+  </div>
+
+  <div class="card">
+    <h2>Per-device Rules</h2>
+    <div>
+      <select id="devList" style="width:300px"></select>
+      <button onclick="newDevice()">New</button>
+    </div>
+    <div style="margin-top:8px">
+      <label>Device Name</label><br>
+      <input id="devName" style="width:300px"><br>
+      <label>Blocked domains (comma separated)</label><br>
+      <input id="devBlocked" style="width:300px"><br>
+      <label>Allowed domains (comma separated)</label><br>
+      <input id="devAllowed" style="width:300px"><br>
+      <button onclick="saveDevice()">Save device</button>
+      <button onclick="pushPolicy()">Push Policy</button>
+      <button onclick="pullPolicy()">Pull Policy</button>
+    </div>
+
+    <h2 style="margin-top:12px">Recent Logs</h2>
+    <button onclick="loadLogs()">Refresh</button>
+    <pre id="logs">(no logs)</pre>
+  </div>
+
+<script>
+async function checkDomain(){
+  const d = document.getElementById('domain').value
+  const dev = document.getElementById('deviceSelect').value
+  const qs = dev ? `?domain=${encodeURIComponent(d)}&device_id=${encodeURIComponent(dev)}` : `?domain=${encodeURIComponent(d)}`
+  const res = await fetch(`/api/check_domain${qs}`)
+  const j = await res.json()
+  document.getElementById('result').innerText = j.blocked ? 'BLOCKED' : 'ALLOWED'
+  loadLogs()
+}
+async function sendSOS(){
+  const res = await fetch('/api/sos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({who:'demo',time:Date.now()})})
+  const j = await res.json()
+  document.getElementById('sosResult').innerText = JSON.stringify(j)
+  loadLogs()
+}
+async function loadLogs(){
+  const res = await fetch('/api/logs')
+  const j = await res.json()
+  document.getElementById('logs').innerText = JSON.stringify(j,null,2)
+}
+async function loadDevices(){
+  const res = await fetch('/api/devices')
+  const devices = await res.json()
+  const sel = document.getElementById('devList')
+  const sel2 = document.getElementById('deviceSelect')
+  sel.innerHTML = ''
+  sel2.innerHTML = ''
+  const keys = Object.keys(devices)
+  keys.forEach(k=>{
+    const opt = document.createElement('option')
+    opt.value = k; opt.text = devices[k].name || k
+    sel.appendChild(opt)
+    const opt2 = document.createElement('option')
+    opt2.value = k; opt2.text = devices[k].name || k
+    sel2.appendChild(opt2)
+  })
+  if(keys.length){
+    loadDeviceDetails(keys[0])
+  }
+}
+async function loadDeviceDetails(id){
+  const res = await fetch('/api/devices')
+  const devices = await res.json()
+  const d = devices[id]
+  if(!d) return
+  document.getElementById('devName').value = d.name || ''
+  document.getElementById('devBlocked').value = (d.blocked_domains||[]).join(',')
+  document.getElementById('devAllowed').value = (d.allowed_domains||[]).join(',')
+}
+function newDevice(){
+  const id = 'dev-' + Math.random().toString(36).slice(2,9)
+  document.getElementById('devList').value = id
+  document.getElementById('devName').value = ''
+  document.getElementById('devBlocked').value = ''
+  document.getElementById('devAllowed').value = ''
+  document.getElementById('devList').appendChild(new Option(id,id))
+}
+async function saveDevice(){
+  const sel = document.getElementById('devList')
+  const id = sel.value || ('dev-' + Math.random().toString(36).slice(2,9))
+  const payload = {
+    id: id,
+    name: document.getElementById('devName').value,
+    blocked_domains: document.getElementById('devBlocked').value.split(',').map(s=>s.trim()).filter(Boolean),
+    allowed_domains: document.getElementById('devAllowed').value.split(',').map(s=>s.trim()).filter(Boolean)
+  }
+  await fetch('/api/devices',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+  await loadDevices()
+}
+async function pushPolicy(){
+  // push current policy + devices
+  const policyRes = await fetch('/api/policy')
+  const policy = await policyRes.json()
+  const devicesRes = await fetch('/api/devices')
+  const devices = await devicesRes.json()
+  await fetch('/api/policy/push',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({policy,devices})})
+  alert('Policy pushed')
+}
+async function pullPolicy(){
+  const res = await fetch('/api/policy/pull')
+  const j = await res.json()
+  // overwrite local view
+  if(j.devices) {
+    // save to server-side storage by posting each device
+    await fetch('/api/policy/push',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(j)})
+    await loadDevices()
+    alert('Policy pulled and applied')
+  }
+}
+document.getElementById('devList')?.addEventListener('change',()=>{loadDeviceDetails(document.getElementById('devList').value)})
+document.getElementById('deviceSelect')?.addEventListener('change',()=>{})
+loadDevices()
+loadLogs()
+</script>
+</body>
+</html>

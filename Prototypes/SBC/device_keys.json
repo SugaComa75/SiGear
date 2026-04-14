@@ -1,0 +1,6 @@
+{
+  "test-api-key-CHANGE-THIS-abc123": {
+    "device_id": "admin",
+    "scopes": ["dns","sync"]
+  }
+}

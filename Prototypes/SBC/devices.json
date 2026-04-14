@@ -1,0 +1,16 @@
+{
+  "device-1": {
+    "id": "device-1",
+    "name": "Alice's Phone",
+    "blocked_domains": [
+      "games.example"
+    ],
+    "allowed_domains": []
+  },
+  "device-2": {
+    "id": "device-2",
+    "name": "Living Room Console",
+    "blocked_domains": [],
+    "allowed_domains": []
+  }
+}

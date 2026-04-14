@@ -1,0 +1,66 @@
+<!--
+  SPDX-License-Identifier: AGPL-3.0-only
+  Copyright (C) 2026 SiGear
+  See LICENSE-AGPLv3.txt in project root for full license text.
+-->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SiGear Mobile Mock</title>
+  <style>body{font-family:Segoe UI,Arial;margin:20px}label{display:block;margin-top:8px}input,button,select{padding:6px;margin-top:6px}</style>
+</head>
+<body>
+  <h1>SiGear Mobile Mock</h1>
+  <div>
+    <label>Server URL</label>
+    <input id="server" value="http://localhost:5000" style="width:320px">
+  </div>
+  <div>
+    <label>Device ID</label>
+    <input id="deviceId" value="device-1" style="width:320px">
+  </div>
+  <div>
+    <label>Bootstrap secret (prototype only)</label>
+    <input id="bootstrap" value="bootstrap-secret-abc123" style="width:320px">
+  </div>
+  <div>
+    <button id="registerBtn">Register (HMAC)</button>
+    <div id="regResult"></div>
+  </div>
+
+  <hr>
+  <div>
+    <label>api_key</label>
+    <input id="apiKey" style="width:420px">
+  </div>
+  <div>
+    <button id="connectBtn">Connect (simulate VPN)</button>
+    <button id="disconnectBtn" disabled>Disconnect</button>
+    <div id="connStatus">Disconnected</div>
+  </div>
+  <div style="margin-top:8px">
+    <button id="provisionVpnBtn">Provision VPN (mock)</button>
+    <pre id="vpnConfig" style="background:#f7f7f7;padding:8px"></pre>
+  </div>
+
+  <hr>
+  <div>
+    <label>DNS domain to check</label>
+    <input id="domain" value="example.com" style="width:320px">
+    <button id="dnsCheckBtn">Check DNS</button>
+    <div id="dnsResult"></div>
+  </div>
+
+  <hr>
+  <div>
+    <label>Update device rules (blocked domains comma-separated)</label>
+    <input id="blocked" style="width:420px">
+    <button id="updateDeviceBtn">Save device rules (POST /api/devices)</button>
+    <div id="updateResult"></div>
+  </div>
+
+<script src="main.js"></script>
+</body>
+</html>

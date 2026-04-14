@@ -1,0 +1,78 @@
+<!--
+  SPDX-License-Identifier: AGPL-3.0-only
+  Copyright (C) 2026 SiGear
+  See LICENSE-AGPLv3.txt in project root for full license text.
+-->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SiGear Admin (Prototype)</title>
+  <style>body{font-family:Arial;margin:20px} .col{display:inline-block;vertical-align:top;width:48%;margin-right:2%} textarea{width:100%;height:120px}</style>
+</head>
+<body>
+  <h1>SiGear Admin</h1>
+  <a href="/admin/logout">Logout</a>
+  <a href="/license" style="margin-left:20px">View License</a>
+  <a href="/download/source" style="margin-left:20px">Download Source</a>
+  <div class="col">
+    <h2>Settings</h2>
+    <form id="settingsForm">
+      <label>Hostname</label><input id="hostname" value="{{settings.hostname}}"><br>
+      <label>Timezone</label><input id="timezone" value="{{settings.timezone}}"><br>
+      <label>Firmware Version</label><input id="fw_version" value="{{settings.fw_version}}"><br>
+      <button type="button" onclick="saveSettings()">Save Settings</button>
+    </form>
+
+    <h3>Firmware Update (mock)</h3>
+    <form id="fwForm" enctype="multipart/form-data">
+      <input type="file" id="fwFile"><br>
+      <button type="button" onclick="uploadFw()">Upload (mock)</button>
+    </form>
+  </div>
+
+  <div class="col">
+    <h2>Devices</h2>
+    <button onclick="exportDevices()">Export CSV</button>
+    <select id="adminDevList" style="width:100%;height:200px" onchange="loadAdminDevice(this.value)">
+      {% for k,v in devices.items() %}
+        <option value="{{k}}">{{v.name or k}}</option>
+      {% endfor %}
+    </select>
+    <div>
+      <label>Device JSON</label>
+      <textarea id="adminDevJson">"select a device"</textarea>
+      <button onclick="saveAdminDevice()">Save</button>
+    </div>
+    <h3>Logs</h3>
+    <button onclick="exportLogs()">Export Logs CSV</button>
+    <div style="height:200px;overflow:auto;border:1px solid #ddd;padding:6px"> <pre id="logPreview">{{ logs|tojson }}</pre></div>
+  </div>
+
+<script>
+async function saveSettings(){
+  const payload = {hostname:document.getElementById('hostname').value, timezone:document.getElementById('timezone').value, fw_version:document.getElementById('fw_version').value}
+  const res = await fetch('/api/admin/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+  alert((await res.json()).status)
+}
+async function uploadFw(){
+  alert('Firmware upload is a mock in this prototype')
+}
+async function loadAdminDevice(id){
+  const res = await fetch('/api/devices')
+  const j = await res.json()
+  document.getElementById('adminDevJson').value = JSON.stringify(j[id]||{},null,2)
+}
+async function saveAdminDevice(){
+  const txt = document.getElementById('adminDevJson').value
+  try{
+    const obj = JSON.parse(txt)
+    const res = await fetch('/api/devices',{method:'POST',headers:{'Content-Type':'application/json','X-API-Key':'test-api-key-CHANGE-THIS-abc123'},body:JSON.stringify(obj)})
+    alert((await res.json()).status)
+  }catch(e){alert('Invalid JSON')}
+}
+function exportDevices(){ window.location = '/api/devices/export' }
+function exportLogs(){ window.location = '/api/logs/export?format=csv' }
+</script>
+</body>
+</html>

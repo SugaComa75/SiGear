@@ -10,7 +10,7 @@
 
 SiGear introduces a new approach to digital safety by shifting from network-only controls to **identity-led guidance**.
 
-Each child is assigned a **Non-Transferable Identity (NTI)**, a secure, privacy-preserving digital identity that enables safe interaction across devices, applications, and online environments **without exposing personal data**.
+Each child is assigned a **Neutral Trusted Identity (NTI)**, a secure,Non-Transferable, privacy-preserving digital identity that enables safe interaction across devices, applications, and online environments **without exposing personal data**.
 
 This identity is paired with a personalised **adaptive avatar**, which acts as the child’s visible presence and interaction layer within the digital environment.
 

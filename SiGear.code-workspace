@@ -1,0 +1,17 @@
+{
+    "folders": [
+        { "path": "." }
+    ],
+    "settings": {
+        "chat.tools.terminal.autoApprove": {
+            "/^git -C \"c:\\\\Users\\\\riksp\\\\Git_Clone\\\\SiGear\" add --renormalize --dry-run -- \"SiGear\\.code-workspace\"$/": {
+                "approve": true,
+                "matchCommandLine": true
+            },
+            "/^npm install$/": {
+                "approve": true,
+                "matchCommandLine": true
+            }
+        }
+    }
+}

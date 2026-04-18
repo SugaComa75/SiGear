@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sigear_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-sigear}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sigear_dev_password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: packages/backend/services/auth-service/Dockerfile
+    environment:
+      PORT: ${AUTH_SERVICE_PORT:-3001}
+      SERVICE_NAME: auth-service
+      DATABASE_URL: postgresql://${POSTGRES_USER:-sigear}:${POSTGRES_PASSWORD:-sigear_dev_password}@postgres:5432/${POSTGRES_DB:-sigear_dev}
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "${AUTH_SERVICE_PORT:-3001}:3001"
+    depends_on:
+      - postgres
+      - redis
+
+  policy-service:
+    build:
+      context: .
+      dockerfile: packages/backend/services/policy-service/Dockerfile
+    environment:
+      PORT: ${POLICY_SERVICE_PORT:-3002}
+      SERVICE_NAME: policy-service
+      DATABASE_URL: postgresql://${POSTGRES_USER:-sigear}:${POSTGRES_PASSWORD:-sigear_dev_password}@postgres:5432/${POSTGRES_DB:-sigear_dev}
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "${POLICY_SERVICE_PORT:-3002}:3002"
+    depends_on:
+      - postgres
+      - redis
+
+  sync-service:
+    build:
+      context: .
+      dockerfile: packages/backend/services/sync-service/Dockerfile
+    environment:
+      PORT: ${SYNC_SERVICE_PORT:-3003}
+      SERVICE_NAME: sync-service
+      DATABASE_URL: postgresql://${POSTGRES_USER:-sigear}:${POSTGRES_PASSWORD:-sigear_dev_password}@postgres:5432/${POSTGRES_DB:-sigear_dev}
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "${SYNC_SERVICE_PORT:-3003}:3003"
+    depends_on:
+      - postgres
+      - redis
+
+volumes:
+  postgres_data:

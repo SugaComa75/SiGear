@@ -1,0 +1,22 @@
+{
+  "name": "sigear",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SiGear monorepo foundation",
+  "engines": {
+    "node": ">=18.12.0"
+  },
+  "workspaces": [
+    "packages/backend/services/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "dev": "npm run dev --workspace @sigear/auth-service",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

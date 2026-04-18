@@ -1,0 +1,327 @@
+openapi: 3.1.0
+info:
+  title: SiGear Core API
+  version: 0.1.0
+  description: >-
+    Phase 0 contract skeleton for the first core services in SiGear.
+servers:
+  - url: https://api.sigear.dev/v1
+    description: Planned production endpoint
+  - url: http://localhost:3001
+    description: Local auth service endpoint
+tags:
+  - name: Authentication
+  - name: Policy
+  - name: Sync
+paths:
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: Authenticate a user and create a session.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successful authentication.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeAuthResponse'
+  /auth/token/verify:
+    post:
+      tags: [Authentication]
+      summary: Validate an access token.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Token is valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeTokenVerificationResponse'
+  /auth/token/refresh:
+    post:
+      tags: [Authentication]
+      summary: Exchange a refresh token for a new access token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: New tokens issued.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeAuthResponse'
+  /auth/logout:
+    post:
+      tags: [Authentication]
+      summary: Revoke an active refresh token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Refresh token revoked.
+  /auth/device/register:
+    post:
+      tags: [Authentication]
+      summary: Register a device using bootstrap credentials.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceRegistrationRequest'
+      responses:
+        '201':
+          description: Device registration accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeDeviceRegistrationResponse'
+  /policies:
+    post:
+      tags: [Policy]
+      summary: Create a policy draft.
+      responses:
+        '201':
+          description: Policy draft created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyResponse'
+  /enforce:
+    post:
+      tags: [Policy]
+      summary: Evaluate an action against active policy.
+      responses:
+        '200':
+          description: Evaluation result returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyEnforcementResponse'
+  /sync/policy/{childId}:
+    get:
+      tags: [Sync]
+      summary: Retrieve pending policy updates for a child.
+      parameters:
+        - in: path
+          name: childId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Pending sync payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncPayload'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    EnvelopeBase:
+      type: object
+      required: [success, timestamp]
+      properties:
+        success:
+          type: boolean
+        timestamp:
+          type: string
+          format: date-time
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 12
+    RefreshRequest:
+      type: object
+      required: [refreshToken]
+      properties:
+        refreshToken:
+          type: string
+    AuthResponse:
+      type: object
+      required: [accessToken, refreshToken, tokenType, expiresIn, user]
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        tokenType:
+          type: string
+          example: Bearer
+        expiresIn:
+          type: integer
+          example: 900
+        user:
+          $ref: '#/components/schemas/UserSummary'
+    EnvelopeAuthResponse:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/AuthResponse'
+            error:
+              $ref: '#/components/schemas/ErrorObject'
+    TokenVerificationResponse:
+      type: object
+      required: [valid, subject, email, role, permissions, tokenType]
+      properties:
+        valid:
+          type: boolean
+        subject:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [parent, child, admin, moderator]
+        permissions:
+          type: array
+          items:
+            type: string
+        tokenType:
+          type: string
+          enum: [access]
+    EnvelopeTokenVerificationResponse:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/TokenVerificationResponse'
+            error:
+              $ref: '#/components/schemas/ErrorObject'
+    DeviceRegistrationRequest:
+      type: object
+      required: [bootstrapId, deviceType, deviceName]
+      properties:
+        bootstrapId:
+          type: string
+        deviceType:
+          type: string
+          enum: [hub, ios, android, macos, school-hub]
+        deviceName:
+          type: string
+    DeviceRegistrationResponse:
+      type: object
+      properties:
+        deviceId:
+          type: string
+          format: uuid
+        bootstrapStatus:
+          type: string
+          enum: [pending, registered, rejected]
+    EnvelopeDeviceRegistrationResponse:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/DeviceRegistrationResponse'
+            error:
+              $ref: '#/components/schemas/ErrorObject'
+    PolicyResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        version:
+          type: integer
+        status:
+          type: string
+        rules:
+          type: object
+          additionalProperties: true
+    PolicyEnforcementResponse:
+      type: object
+      properties:
+        allowed:
+          type: boolean
+        reason:
+          type: string
+        policyId:
+          type: string
+          format: uuid
+    SyncPayload:
+      type: object
+      properties:
+        childId:
+          type: string
+          format: uuid
+        policies:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyResponse'
+        generatedAt:
+          type: string
+          format: date-time
+    UserSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [parent, child, admin, moderator]
+    AccessTokenClaims:
+      type: object
+      properties:
+        sub:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [parent, child, admin, moderator]
+        permissions:
+          type: array
+          items:
+            type: string
+        type:
+          type: string
+          enum: [access]
+    ErrorObject:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true

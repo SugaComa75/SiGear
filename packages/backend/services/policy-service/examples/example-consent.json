@@ -1,0 +1,10 @@
+{
+  "id": "b6e9f8a1-1c2d-4e3f-9a0b-7c6d5e4f3a2b",
+  "identityId": "user:1234",
+  "ruleId": "8a7f9f2c-3b6f-4c1e-9a2f-0f1d2c3b4e5f",
+  "state": "active",
+  "provenance": { "method": "user_grant", "via": "parent_dashboard" },
+  "createdAt": "2026-04-20T10:01:00Z",
+  "updatedAt": null,
+  "metadata": { "consentVersion": 1 }
+}

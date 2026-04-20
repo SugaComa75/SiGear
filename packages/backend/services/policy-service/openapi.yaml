@@ -1,0 +1,35 @@
+openapi: 3.0.3
+info:
+  title: SiGear Policy Service API
+  version: 0.1.0
+paths:
+  /v1/evaluate:
+    post:
+      summary: Evaluate a requested action against NTI rules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                identityId:
+                  type: string
+                action:
+                  type: string
+                purpose:
+                  type: string
+      responses:
+        '200':
+          description: Decision response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                  error:
+                    type: object

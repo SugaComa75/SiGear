@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NTI Policy Rule",
+  "type": "object",
+  "required": ["id", "version", "scope", "capabilityAxes", "createdBy", "createdAt"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "version": { "type": "integer", "minimum": 1 },
+    "scope": { "type": "string", "enum": ["global", "app", "identity"] },
+    "scopeRef": { "type": ["string", "null"] },
+    "capabilityAxes": {
+      "type": "object",
+      "properties": {
+        "identity_linkage": { "type": "string", "enum": ["anonymous","pseudonymous","identifiable"] },
+        "storage_duration": { "type": "string", "enum": ["session","time_limited","long_term"] },
+        "derivative_creation": { "type": "string", "enum": ["none","aggregation","model_training","synthetic_reuse"] },
+        "purpose_scope": { "type": "string", "enum": ["single","related","general_improvement"] },
+        "cross_service_sharing": { "type": "string", "enum": ["isolated","ecosystem","unrestricted"] },
+        "monetisation_use": { "type": "string", "enum": ["prohibited","indirect","commercial"] },
+        "transparency_level": { "type": "string", "enum": ["full_audit","summary_only","system_only"] }
+      },
+      "additionalProperties": false
+    },
+    "allowedPurposes": { "type": "array", "items": { "type": "string" } },
+    "retention": {
+      "type": "object",
+      "properties": {
+        "maxDays": { "type": "integer", "minimum": 0 },
+        "conditions": { "type": "string" }
+      }
+    },
+    "derivativePolicy": { "type": "string" },
+    "createdBy": { "type": "string" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "description": { "type": "string" }
+  },
+  "additionalProperties": false
+}

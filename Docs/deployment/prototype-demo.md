@@ -24,6 +24,22 @@ The command executes:
 
 - `packages/backend/services/policy-service/test/prototype.scenario.ts`
 
+## Decision Flow
+
+```mermaid
+flowchart LR
+	A[Incoming Request] --> B[Policy Rule Evaluation]
+	B --> C{Consent Lifecycle State}
+	C -->|active| D[Authorization Decision]
+	C -->|dormant| E[Read-Only Constraint Check]
+	C -->|recovery| F[Re-Authentication Gate]
+	C -->|archive or deleted| G[Processing Denied]
+	E --> D
+	F --> D
+	G --> D
+	D --> H[Audit Event Persisted]
+```
+
 It uses file-backed policy documents and prints decisions for five scenarios:
 1. Safe social connection request (allow).
 2. Model training request (deny).

@@ -2,7 +2,34 @@
 
 This guide helps you walk stakeholders through the NTI prototype and explain what makes SiGear different.
 
+## System Flow
+
+Use this diagram early in the demo to show the decision path before stepping through the five scenarios.
+
+```mermaid
+flowchart LR
+	A[Incoming Request]
+	--> B[Policy Rule Evaluation]
+	B --> C{Consent Lifecycle State}
+	C -->|active| D[Authorization Decision]
+	C -->|dormant| E[Read-Only Constraint Check]
+	C -->|recovery| F[Re-Authentication Gate]
+	C -->|archive or deleted| G[Processing Denied]
+	E --> D
+	F --> D
+	G --> D
+	D --> H[Audit Event Persisted]
+```
+
+What to say:
+
+- Every request enters the same evaluation pipeline.
+- SiGear checks both the policy rule and the current consent lifecycle state.
+- The authorization result is explainable, then persisted as an audit event.
+
 ## Opening (30 seconds)
+
+> "SiGear turns consent into something systems must obey—not something users have to trust."
 
 > "SiGear is a digital identity system built on **consent as a living, enforceable contract**. Unlike traditional systems that grant broad permissions once and forget them, SiGear makes every data use auditable, reversible, and aligned to what a parent or young person actually consented to."
 
@@ -32,8 +59,10 @@ This guide helps you walk stakeholders through the NTI prototype and explain wha
 **Why this matters:**
 
 - **Purpose-driven consent**: The original consent didn't include training models. SiGear enforces the actual agreement, not a lawyer's interpretation of buried terms.
+- **No silent reuse**: If the purpose changes, consent must change. Full stop.
 - **Derivative control**: Even if the data seems "anonymized," SiGear knows that model training is a derivative use with downstream risks. The system enforces that boundary.
 - **No dark patterns**: Platforms can't repurpose data without re-consent. This is what GDPR intended but couldn't technically enforce. SiGear does.
+
 
 ---
 
@@ -46,6 +75,7 @@ This guide helps you walk stakeholders through the NTI prototype and explain wha
 **Why this matters:**
 
 - **Lifecycle controls**: Real life has seasons. During a dormant period (recovery, digital detox, or safety review), the system respects that the young person has paused. Read-only is safe; writes and derivatives are not.
+- **Real-world relevance**: Think of a child choosing to step back from digital life during a stressful period—such as exams, a personal loss, or needing time to reset. This isn’t about system failure; it’s about giving families control. Dormancy means the system pauses with them—not behind them.
 - **No surprise processing**: Many systems keep crunching data in the background even after a user asks to pause. SiGear's lifecycle model makes dormancy actually mean something.
 - **Auditability**: Every attempt to write during dormancy is logged, so parents and young people can see if a platform tried to cheat.
 
@@ -87,6 +117,7 @@ This guide helps you walk stakeholders through the NTI prototype and explain wha
 - **Accountability**: If a dispute arises ("Did you really deny my data?"), the audit log proves it.
 - **Compliance-ready**: Regulators and parents can see exactly what happened and when.
 - **No black box**: Traditional systems hide policy logic. SiGear publishes it.
+- **Evidence, not claims**: SiGear doesn't say it protects users—it proves it, decision by decision.
 
 ---
 
@@ -101,6 +132,8 @@ This guide helps you walk stakeholders through the NTI prototype and explain wha
 > 5. **Modernization**: This is what 2026 digital identity should look like.
 >
 > And this is just the file-backed version running locally with no database. The production system adds real-time policy updates, cross-service enforcement, and delegation—all while keeping the same core promise: **consent you can trust.**"
+
+> "This isn’t a new privacy policy. It’s a new expectation of how systems behave."
 
 ---
 

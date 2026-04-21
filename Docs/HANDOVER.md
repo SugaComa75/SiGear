@@ -1,55 +1,61 @@
 
 # SiGear Handover Notes
 
-Current status (2026-04-20): this document captures what has been implemented, how to validate it locally, and the immediate next steps so engineers can continue work while preserving NTI design intent.
+Current status (2026-04-21): backend foundation is now in place for a working NTI prototype path and a scalable Postgres path. This handover captures completed work, validation, and the highest-priority follow-ups.
 
 Completed artifacts (canonical)
-- [packages/backend/services/policy-service/schemas/rule.schema.json](packages/backend/services/policy-service/schemas/rule.schema.json) — JSON Schema for NTI policy rules
-- [packages/backend/services/policy-service/schemas/consent.schema.json](packages/backend/services/policy-service/schemas/consent.schema.json) — JSON Schema for consent records
-- [packages/backend/services/policy-service/examples/example-rule.json](packages/backend/services/policy-service/examples/example-rule.json) — Example rule
-- [packages/backend/services/policy-service/examples/example-consent.json](packages/backend/services/policy-service/examples/example-consent.json) — Example consent record
-- [packages/backend/services/policy-service/src/evaluate.ts](packages/backend/services/policy-service/src/evaluate.ts) — Minimal deterministic evaluator and HTTP handler
-- [packages/backend/services/policy-service/src/index.ts](packages/backend/services/policy-service/src/index.ts) — Health endpoint + `/v1/evaluate` wiring
-- [packages/backend/services/policy-service/test/evaluate.test.ts](packages/backend/services/policy-service/test/evaluate.test.ts) — Small smoke tests (run locally)
-- [packages/backend/services/policy-service/openapi.yaml](packages/backend/services/policy-service/openapi.yaml) — Policy service OpenAPI skeleton
-- [packages/backend/services/auth-service/openapi.yaml](packages/backend/services/auth-service/openapi.yaml) — Auth service OpenAPI skeleton
+- [packages/backend/services/policy-service/src/evaluate.ts](packages/backend/services/policy-service/src/evaluate.ts) — policy evaluator with lifecycle + capability-axis enforcement, obligations, and audit metadata
+- [packages/backend/services/policy-service/src/repository.ts](packages/backend/services/policy-service/src/repository.ts) — repository abstraction (`file` and `postgres`) with schema validation at load time
+- [packages/backend/services/policy-service/schemas/rule.schema.json](packages/backend/services/policy-service/schemas/rule.schema.json) — canonical JSON Schema for rules
+- [packages/backend/services/policy-service/schemas/consent.schema.json](packages/backend/services/policy-service/schemas/consent.schema.json) — canonical JSON Schema for consent records
+- [packages/backend/services/policy-service/test/evaluate.test.ts](packages/backend/services/policy-service/test/evaluate.test.ts) — deterministic evaluator tests, including file-backed audit write path
+- [packages/backend/services/policy-service/test/prototype.scenario.ts](packages/backend/services/policy-service/test/prototype.scenario.ts) — one-command stakeholder prototype scenarios
+- [packages/backend/services/policy-service/openapi.yaml](packages/backend/services/policy-service/openapi.yaml) — expanded evaluate request context + response obligations/audit shape
+- [packages/backend/services/auth-service/src/tokens.ts](packages/backend/services/auth-service/src/tokens.ts) — NTI claims in access token model
+- [packages/backend/services/auth-service/src/index.ts](packages/backend/services/auth-service/src/index.ts) — login/refresh/verify now include NTI claim flow
+- [packages/backend/services/auth-service/test/tokens.test.ts](packages/backend/services/auth-service/test/tokens.test.ts) — NTI claim token test
+- [packages/backend/services/auth-service/openapi.yaml](packages/backend/services/auth-service/openapi.yaml) — token verify response includes NTI claims
+- [infrastructure/database/migrations/0003_policy_engine_tables.sql](infrastructure/database/migrations/0003_policy_engine_tables.sql) — policy tables migration
+- [infrastructure/database/schema.sql](infrastructure/database/schema.sql) — canonical schema includes policy tables and indexes
+- [.github/workflows/ci.yml](.github/workflows/ci.yml) — backend quality gates (lint/test/build matrix for auth and policy)
+- [scripts/policy-postgres-switch.ps1](scripts/policy-postgres-switch.ps1) — migration/switch helper for Postgres mode
+- [Docs/deployment/policy-postgres-switch.md](Docs/deployment/policy-postgres-switch.md) — Postgres switch runbook
+- [Docs/deployment/prototype-demo.md](Docs/deployment/prototype-demo.md) — prototype runbook with technical flow diagram
+- [Docs/deployment/prototype-demo-talk-track.md](Docs/deployment/prototype-demo-talk-track.md) — stakeholder narrative + technical flow support
 
-Validation performed
-- Ran the policy-service evaluator tests locally:
-	- Command: `node --loader ts-node/esm ./test/evaluate.test.ts` (from the service directory)
-	- Result: tests passed (basic allow/deny cases for model-training).
+Validation performed (latest)
+- Command: `npm run prototype:demo`
+- Result: passed; scenarios output expected allow/deny behavior and audit count
+- Command: `npm run lint --workspace @sigear/policy-service`
+- Result: passed
 
-How to validate locally (quick)
-1. Open a terminal and change to the policy-service folder:
+How to run locally (quick)
+1. From repository root, run the minimal demo flow:
 
 ```powershell
-cd packages/backend/services/policy-service
+npm run prototype:demo
 ```
 
-2. Run the evaluator smoke tests:
+2. Review stakeholder walkthrough notes:
+
+- [Docs/deployment/prototype-demo.md](Docs/deployment/prototype-demo.md)
+- [Docs/deployment/prototype-demo-talk-track.md](Docs/deployment/prototype-demo-talk-track.md)
+
+3. Optional: switch to Postgres-backed policy mode:
 
 ```powershell
-node --loader ts-node/esm ./test/evaluate.test.ts
-```
-
-3. Start the service and POST a request to evaluate (optional):
-
-```powershell
-node --loader ts-node/esm ./src/index.ts
-curl -X POST http://localhost:3002/v1/evaluate -H "Content-Type: application/json" -d '{"identityId":"user:123","action":"derive","purpose":"model_training"}'
+npm run policy:postgres:switch
 ```
 
 Immediate next steps (priority order)
-1. Wire evaluator to load real rule and consent documents (DB or file store) and implement full axis evaluation logic. (blocks enforcement correctness.)
-2. Add audit logging and obligations to evaluation responses (append-only audit events). (legal/compliance requirement.)
-3. Integrate `auth-service` to propagate NTI identity claims and generate short-lived evaluation tokens for SiGear adapters.
-4. Add CI job to run policy-service tests and fail the build on regressions.
-5. Generate client SDKs from the OpenAPI specs and add lightweight enforcement middleware to key services.
+1. Add auth integration tests (login/refresh/revoke against DB fixtures) in [packages/backend/services/auth-service](packages/backend/services/auth-service).
+2. Add explicit policy evaluation hook/middleware into auth runtime path for end-to-end enforcement.
+3. Add optional CI smoke for Postgres-backed policy evaluation after migrations.
+4. Apply migration 0003 in all target environments used for backend testing/deploy.
+5. Begin SDK/client adapter generation from the updated OpenAPI contracts.
 
-Assigned owner suggestions
-- Policy evaluation core: backend team (PolicyEngine / `policy-service`)
-- Auth ↔ NTI mapping: `auth-service` maintainers
-- Enforcement adapters + clients: web/mobile/hub teams
-
-If you want, I can start with step 1 and wire the evaluator to load the example documents and apply the full axis checks. Otherwise I will wait for your go-ahead before making further changes.
+Known constraints and notes
+- File-backed mode is intentionally default for rapid demo and local onboarding.
+- Postgres mode is ready via env switch and migration helper; it should be treated as source-of-truth path for scaled environments.
+- Current prototype demonstrates NTI capability/lifecycle enforcement and auditability; remaining work is integration hardening.
 

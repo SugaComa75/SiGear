@@ -10,6 +10,8 @@ export type AccessTokenClaims = {
   sub: string;
   email: string;
   role: AuthRole;
+  ntiIdentityId: string;
+  ntiAssuranceLevel: "base" | "verified";
   permissions: string[];
   type: "access";
 };

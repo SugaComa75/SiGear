@@ -35,3 +35,38 @@ paths:
       responses:
         '200':
           description: New tokens
+  /auth/token/verify:
+    post:
+      summary: Verify access token and return NTI claims
+      responses:
+        '200':
+          description: Token verification details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      valid:
+                        type: boolean
+                      subject:
+                        type: string
+                      email:
+                        type: string
+                      role:
+                        type: string
+                      ntiIdentityId:
+                        type: string
+                      ntiAssuranceLevel:
+                        type: string
+                        enum: [base, verified]
+                      permissions:
+                        type: array
+                        items:
+                          type: string
+                      tokenType:
+                        type: string

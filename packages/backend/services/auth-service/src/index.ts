@@ -83,7 +83,9 @@ app.post("/auth/login", async (request, response, next) => {
     const accessToken = createAccessToken({
       sub: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
+      ntiIdentityId: user.id,
+      ntiAssuranceLevel: "verified"
     });
     const refreshToken = createRefreshToken(user.id);
     const refreshTokenHash = hashToken(refreshToken);
@@ -136,6 +138,8 @@ app.post("/auth/token/verify", (request, response, next) => {
         subject: claims.sub,
         email: claims.email,
         role: claims.role,
+        ntiIdentityId: claims.ntiIdentityId,
+        ntiAssuranceLevel: claims.ntiAssuranceLevel,
         permissions: claims.permissions,
         tokenType: claims.type
       },
@@ -181,7 +185,9 @@ app.post("/auth/token/refresh", async (request, response, next) => {
     const accessToken = createAccessToken({
       sub: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
+      ntiIdentityId: user.id,
+      ntiAssuranceLevel: "verified"
     });
     const refreshToken = createRefreshToken(user.id);
     const refreshTokenHash = hashToken(refreshToken);

@@ -6,6 +6,10 @@
 ![Security Policy](https://img.shields.io/badge/Security-Responsible%20Disclosure-orange)
 ![Status](https://img.shields.io/badge/Status-Planning-yellow)
 
+<!-- Actions badge: points to GitHub repository actions -->
+[![Policy Eval Signature Test](https://github.com/SugaComa75/SiGear/actions/workflows/policy-eval-signature-test.yml/badge.svg)](https://github.com/SugaComa75/SiGear/actions/workflows/policy-eval-signature-test.yml)
+
+
 ## Project Name (SiGear)
 
 Open, auditable, safety‑first digital identity and device ecosystem
@@ -16,6 +20,7 @@ The system is built on three core principles:
 - Transparency — All logic, behaviour, and data flows are openly documented.
 - Auditability — Anyone can inspect the source to verify that it does exactly what it claims.
 - Safety by Design — Every component is engineered with privacy, protection, and user agency at its core.
+SiGear is fail-closed by design: new capabilities, hidden toggles, or default-on options are denied until explicitly reviewed and approved.
 This repository contains the full conceptual, architectural, and governance documentation required to understand, evaluate, and contribute to the system.
 
 ## Why AGPLv3?

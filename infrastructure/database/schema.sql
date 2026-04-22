@@ -108,6 +108,9 @@ CREATE TABLE policy_audit_events (
   consent_state VARCHAR(32),
   allowed BOOLEAN NOT NULL,
   reasons TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  reason_codes TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  unknown_requested_axes TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  unapproved_requested_axes TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
   payload JSONB NOT NULL DEFAULT '{}'::jsonb
 );
 

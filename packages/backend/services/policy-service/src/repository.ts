@@ -56,6 +56,9 @@ export type EvaluationAuditEvent = {
   consentState: string | null;
   allowed: boolean;
   reasons: string[];
+  reasonCodes?: string[];
+  unknownRequestedAxes?: string[];
+  unapprovedRequestedAxes?: string[];
 };
 
 export type LoadedPolicyDocuments = {
@@ -66,6 +69,7 @@ export type LoadedPolicyDocuments = {
 export interface PolicyRepository {
   load(identityId: string, requestedRuleId?: string): Promise<LoadedPolicyDocuments>;
   appendAuditEvent(event: EvaluationAuditEvent): Promise<void>;
+  listPendingUnknown(limit?: number): Promise<EvaluationAuditEvent[]>;
 }
 
 type RepositoryOptions = {
@@ -191,6 +195,28 @@ export class FilePolicyRepository implements PolicyRepository {
     await fs.mkdir(path.dirname(this.auditLogPath), { recursive: true });
     await fs.appendFile(this.auditLogPath, `${JSON.stringify(event)}\n`, "utf8");
   }
+
+  async listPendingUnknown(limit = 100): Promise<EvaluationAuditEvent[]> {
+    const content = await fs.readFile(this.auditLogPath, "utf8");
+    const lines = content
+      .split("\n")
+      .map((l) => l.trim())
+      .filter((l) => l.length > 0);
+
+    const events: EvaluationAuditEvent[] = [];
+    for (let i = lines.length - 1; i >= 0 && events.length < limit; i--) {
+      try {
+        const parsed = JSON.parse(lines[i]) as EvaluationAuditEvent & { unknownRequestedAxes?: string[]; unapprovedRequestedAxes?: string[] };
+        if ((parsed.unknownRequestedAxes && parsed.unknownRequestedAxes.length > 0) || (parsed.unapprovedRequestedAxes && parsed.unapprovedRequestedAxes.length > 0)) {
+          events.push(parsed as EvaluationAuditEvent);
+        }
+      } catch {
+        // ignore parse errors
+      }
+    }
+
+    return events;
+  }
 }
 
 type DbRuleRow = {
@@ -287,37 +313,75 @@ export class PostgresPolicyRepository implements PolicyRepository {
   async appendAuditEvent(event: EvaluationAuditEvent): Promise<void> {
     await this.pool.query(
       `
-        INSERT INTO policy_audit_events (
-          id,
-          created_at,
-          identity_id,
-          action,
-          purpose,
-          rule_id,
-          rule_version,
-          consent_id,
-          consent_state,
-          allowed,
-          reasons,
-          payload
-        )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+            INSERT INTO policy_audit_events (
+              id,
+              created_at,
+              identity_id,
+              action,
+              purpose,
+              rule_id,
+              rule_version,
+              consent_id,
+              consent_state,
+              allowed,
+              reasons,
+              reason_codes,
+              unknown_requested_axes,
+              unapproved_requested_axes,
+              payload
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
       `,
-      [
-        event.id,
-        event.timestamp,
-        event.identityId,
-        event.action,
-        event.purpose,
-        event.ruleId,
-        event.ruleVersion,
-        event.consentId,
-        event.consentState,
-        event.allowed,
-        event.reasons,
-        event
-      ]
+          [
+            event.id,
+            event.timestamp,
+            event.identityId,
+            event.action,
+            event.purpose,
+            event.ruleId,
+            event.ruleVersion,
+            event.consentId,
+            event.consentState,
+            event.allowed,
+            event.reasons,
+            (event as any).reasonCodes ?? [],
+            event.unknownRequestedAxes ?? [],
+            event.unapprovedRequestedAxes ?? [],
+            event
+          ]
     );
+  }
+
+  async listPendingUnknown(limit = 100): Promise<EvaluationAuditEvent[]> {
+    const res = await this.pool.query(
+      `
+        SELECT id, created_at AS timestamp, identity_id AS "identityId", action, purpose, rule_id AS "ruleId",
+               rule_version AS "ruleVersion", consent_id AS "consentId", consent_state AS "consentState",
+               allowed, reasons, reason_codes AS "reasonCodes", payload, unknown_requested_axes AS "unknownRequestedAxes", unapproved_requested_axes AS "unapprovedRequestedAxes"
+        FROM policy_audit_events
+        WHERE (COALESCE(array_length(unknown_requested_axes,1),0) > 0) OR (COALESCE(array_length(unapproved_requested_axes,1),0) > 0) OR (COALESCE(array_length(reason_codes,1),0) > 0)
+        ORDER BY created_at DESC
+        LIMIT $1
+      `,
+      [limit]
+    );
+
+    return res.rows.map((row: any) => ({
+      id: row.id,
+      timestamp: row.timestamp,
+      identityId: row.identityId,
+      action: row.action,
+      purpose: row.purpose,
+      ruleId: row.ruleId,
+      ruleVersion: row.ruleVersion,
+      consentId: row.consentId,
+      consentState: row.consentState,
+      allowed: row.allowed,
+      reasons: row.reasons,
+      reasonCodes: row.reasonCodes,
+      unknownRequestedAxes: row.unknownRequestedAxes,
+      unapprovedRequestedAxes: row.unapprovedRequestedAxes
+    } as EvaluationAuditEvent));
   }
 }
 

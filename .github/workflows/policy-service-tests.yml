@@ -1,0 +1,29 @@
+name: Policy Service Tests
+
+on:
+  push:
+    paths:
+      - 'packages/backend/services/policy-service/**'
+  pull_request:
+    paths:
+      - 'packages/backend/services/policy-service/**'
+
+jobs:
+  test:
+    name: Run backend policy-service tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install repo dependencies
+        run: npm ci
+
+      - name: Run policy-service tests
+        working-directory: packages/backend/services/policy-service
+        run: npm test

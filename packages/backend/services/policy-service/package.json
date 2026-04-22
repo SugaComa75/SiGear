@@ -8,6 +8,7 @@
     "dev": "node --watch --loader ts-node/esm src/index.ts",
     "lint": "tsc -p tsconfig.json --noEmit",
     "prototype": "node --loader ts-node/esm ./test/prototype.scenario.ts",
+    "prototype:demo2": "node --loader ts-node/esm ./test/prototype.scenario.2.ts",
     "test": "node --loader ts-node/esm ./test/evaluate.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
@@ -15,11 +16,15 @@
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.0",
+    "jwks-rsa": "^3.0.0",
     "pg": "^8.13.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.8.7",
+    "@types/jsonwebtoken": "^9.0.0",
+    "@types/jwks-rsa": "^2.0.5",
     "@types/pg": "^8.11.10",
     "ts-node": "^10.9.2"
   }

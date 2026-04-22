@@ -59,3 +59,26 @@ Known constraints and notes
 - Postgres mode is ready via env switch and migration helper; it should be treated as source-of-truth path for scaled environments.
 - Current prototype demonstrates NTI capability/lifecycle enforcement and auditability; remaining work is integration hardening.
 
+Recent additions (2026-04-22)
+
+- `packages/shared/policy-eval` — browser/node evaluator and demo with optional avatar signature verification for local NTI enforcement (`packages/shared/policy-eval/index.js`, demo assets and `verify.test.js`).
+- Policy evaluator updates: `reasonCodes` and unknown/unapproved axis reporting added to obligations and audit events (`packages/backend/services/policy-service/src/evaluate.ts`).
+- Repository updates: Postgres persistence for `reason_codes` and audit fields (`packages/backend/services/policy-service/src/repository.ts`).
+- Database migrations: `0004_add_unknown_axes.sql` and `0005_add_reason_codes.sql` added to record unknown axes and persist `reason_codes` in `policy_audit_events`.
+- Tests and CI: audit `reasonCodes` tests and signature verification tests added; CI workflows updated to provision Postgres, apply migrations, and run Postgres-backed tests.
+
+Where we are now
+
+- Core evaluator enforces NTI policy axes and lifecycle states and emits standardized `reasonCodes` for denials and audit classification.
+- Audit persistence is verified end-to-end: file-backed NDJSON for demos and Postgres for CI/production; CI now applies migrations and validates Postgres-backed tests.
+- Admin API exists to list pending unknown/unapproved events for review; admin UI is the next logical step.
+- Shared evaluator and demo provide a reference for browser-local enforcement and optional avatar signing/verification for offline NTI enforcement.
+
+Updated next steps (short list)
+
+1. Apply DB migrations `0004_add_unknown_axes.sql` and `0005_add_reason_codes.sql` in staging and production as part of the Postgres migration runbook.
+2. Add an admin UI or lightweight script to review and approve pending unknown/unapproved audit events exposed by the admin API.
+3. Add E2E auth integration tests and a policy-evaluation hook/middleware in the auth runtime path.
+4. Optional: publish a Grafana dashboard JSON using queries in `Docs/observability/reason_codes_queries.md` to visualize `reason_codes` trends.
+5. Generate SDK/client adapters from updated OpenAPI contracts and publish examples for browser enforcement using `packages/shared/policy-eval`.
+

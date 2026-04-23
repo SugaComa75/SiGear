@@ -24,7 +24,6 @@
     "@types/express": "^5.0.0",
     "@types/node": "^22.8.7",
     "@types/jsonwebtoken": "^9.0.0",
-    "@types/jwks-rsa": "^2.0.5",
     "@types/pg": "^8.11.10",
     "ts-node": "^10.9.2"
   }

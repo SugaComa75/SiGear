@@ -41,7 +41,7 @@
                                         │ • Avatar  │
                                         └───────────┘
 
-        NTI (Non-Transferable Identity) flows across all components
+        NTI (Neutral Trusted Identity) flows across all components
         providing authentication, policy enforcement, and privacy protection
 
 
@@ -82,7 +82,7 @@
 
 
 ### 6. NTI Identity & Avatar Layer
-- Non-Transferable Identity (NTI) acts as a secure, non-clonable identity anchor  
+- Neutral Trusted Identity (NTI) acts as a secure, non-clonable identity anchor  
 - Avatar provides a child-friendly interface for authentication and guidance  
 - Functions as a passkey-style login (no usernames/passwords)  
 - Enforces age and permission rules without sharing personal data  

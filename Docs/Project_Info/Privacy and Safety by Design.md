@@ -4,7 +4,7 @@
 
 SiGear is designed as a **privacy-first digital safety system**, where protection is achieved through **minimal data exposure**, **identity-led verification**, and **guided interaction**, rather than surveillance or extensive data collection.
 
-The system uses a **Non-Transferable Identity (NTI)** framework and adaptive avatar interface to ensure that safety decisions can be made **without sharing raw personal data**.
+The system uses a **Neutral Trusted Identity (NTI)** framework and adaptive avatar interface to ensure that safety decisions can be made **without sharing raw personal data**.
 
 ---
 

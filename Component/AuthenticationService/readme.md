@@ -1,7 +1,7 @@
 # AuthenticationService
 
 ## Purpose
-Core identity verification and authentication service. Manages user authentication tokens, NTI (Non-Transferable Identity) verification, session management, and credential validation across all SiGear services.
+Core identity verification and authentication service. Manages user authentication tokens, NTI (Neutral Trusted Identity) verification, session management, and credential validation across all SiGear services.
 
 ## Responsibilities
 - **Identity Verification**: Verify NTI status, check identity freshness, validate identity claims
@@ -28,7 +28,7 @@ Core identity verification and authentication service. Manages user authenticati
 - `POST /api/v1/auth/credential/revoke` - Revoke compromised credentials
 
 ## Authentication Methods
-1. **NTI + Avatar**: Primary authentication using Non-Transferable Identity
+1. **NTI + Avatar**: Primary authentication using Neutral Trusted Identity
 2. **Passkey/WebAuthn**: Hardware key or biometric authentication (Control App, Admin)
 3. **TOTP/2FA**: Time-based one-time passwords for sensitive operations
 4. **Yubikey**: Hardware token support for identity backup and recovery

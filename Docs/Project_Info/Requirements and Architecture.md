@@ -12,7 +12,7 @@ Project: SiGear — UK Digital Safety System
 
 ## 3. Identity-Led Safety Requirement (NTI System)
 
-***The system must implement a Non-Transferable Identity (NTI) framework as a core component.
+***The system must implement a Neutral Trusted Identity (NTI) framework as a core component.
 
 Requirements:
 

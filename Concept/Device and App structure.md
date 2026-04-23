@@ -4,7 +4,7 @@ SiGear combines **identity, device, and network layers** into a unified child-sa
 
 At its core:
 
-* **NTI (Non-Transferable Identity)** defines *who the child is allowed to be*
+* **NTI (Neutral Trusted Identity)** defines *who the child is allowed to be*
 * **Avatar Interface** defines *how the child experiences the system*
 * **Hub + App + Dashboard** define *where and how rules are applied*
 

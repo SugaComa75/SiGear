@@ -452,7 +452,7 @@ SiGear is an identity-led digital safety system for children. This roadmap outli
 - **Accelerated (with 2-3 contributors)**: 18-22 weeks to MVP
 - **Full team (4+ people)**: 14-16 weeks to MVP
 
-**Core Innovation**: Non-Transferable Identity (NTI) + Adaptive Avatar model shifts from network-only restriction to guidance-based safety.
+**Core Innovation**: Neutral Trusted Identity (NTI) + Adaptive Avatar model shifts from network-only restriction to guidance-based safety.
 
 **Success Criteria**: 
 - Identity-based safety enforcement across Hub, Mobile App, and ControlApp

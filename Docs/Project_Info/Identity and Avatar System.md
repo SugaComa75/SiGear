@@ -2,7 +2,7 @@
 
 ## Overview
 
-The SiGear Identity and Avatar System introduces a new approach to digital safety by combining **Non-Transferable Identity (NTI)** with an **adaptive avatar interface**.
+The SiGear Identity and Avatar System introduces a new approach to digital safety by combining **Neutral Trusted Identity (NTI)** with an **adaptive avatar interface**.
 
 This system enables children to safely interact with digital environments without exposing personal data, while providing a guided and intuitive user experience.
 
@@ -27,7 +27,7 @@ Each child is assigned a secure identity (NTI), which determines:
 
 ---
 
-## Non-Transferable Identity (NTI)
+## Neutral Trusted Identity (NTI)
 
 The NTI is a secure digital identity bound to the user.
 

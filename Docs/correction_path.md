@@ -49,3 +49,13 @@
 
 ### Suggested Commit Message:
 "Updated concept files, archived duplicates, and added acceptance criteria in deployment docs."
+
+## Completed (2026-04-23)
+
+- Imported and merged changes from external pull copy into `main`.
+- Added a local type shim `packages/backend/services/policy-service/src/jwks-rsa.d.ts` and removed the unavailable devDependency `@types/jwks-rsa` to fix install failures; updated `package-lock.json` and verified `npm ci` completes locally.
+- Canonicalized the Digital Safety Concept file and archived duplicates under `Concept/archive/`.
+- Inserted a canonical definition for Neutral Trusted Identity (NTI) and normalized usages across the repository to `Neutral Trusted Identity (NTI)`.
+- Removed legacy synonym phrasing and added `Concept/TERMINOLOGY.md` with the canonical definition; linked it from `Concept/00_INDEX.md`.
+
+If you want a one-line changelog entry for release notes, I can add it to `Concept/CHANGELOG.md`.

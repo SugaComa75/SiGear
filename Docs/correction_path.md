@@ -9,15 +9,15 @@
      - Create a new file in `Concept/archive/` with a pointer to the canonical file:
       - `echo 'This file is archived and points to Concept/Digital Safety Concept.md' > Concept/archive/<duplicate_file_name>_archived.md`
 
-3. **Update NTI-Clean-Model**  
-   - Add sections for the following topics in *Concept/NTI-Clean-Model.md*:  
+3. **Update NTI Clean Model**  
+   - Add sections for the following topics in *Concept/NTI Clean Model.md*:  
      - **NTI Minting Proofing Bootstrap**  
      - **Non-Transferable Operational Definition**  
      - **Avatar As Visual Identifier (Not Enforcement Authority)**  
      - **Life-Stage Evolution**  
      - **Post-MVP Platform Integration**  
    - Use the following commands to edit:  
-     - `code Concept/NTI-Clean-Model.md`
+     - `code Concept/NTI Clean Model.md`
 
 4. **Update Index File**  
    - Ensure that *Concept/00_INDEX.md* points to the canonical file:  

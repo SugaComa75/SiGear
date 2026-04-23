@@ -143,4 +143,3 @@ Outline how NTI consent and capability axes evolve across user life-stages (e.g.
 ### Post-MVP Platform Integration
 
 Roadmap notes for integrating NTI into larger platforms post-MVP. Include compatibility notes (APIs, data contracts), required migrations, and suggested governance patterns for platform partners.
-

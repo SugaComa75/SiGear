@@ -9,14 +9,14 @@
      - ~~Create a new file in `Concept/archive/` with a pointer to the canonical file:~~
       - ~~`echo 'This file is archived and points to Concept/Digital Safety Concept.md' > Concept/archive/<duplicate_file_name>_archived.md`~~
 
-3. ~~**Update NTI Clean Model**~~  
-   - ~~Add sections for the following topics in *Concept/NTI Clean Model.md*:~~  
-     - ~~**NTI Minting Proofing Bootstrap**~~  
-     - ~~**Non-Transferable Operational Definition**~~  
-     - ~~**Avatar As Visual Identifier (Not Enforcement Authority)**~~  
-     - ~~**Life-Stage Evolution**~~  
-     - ~~**Post-MVP Platform Integration**~~  
-   - ~~Use the following commands to edit:~~  
+3. ~~**Update NTI Clean Model**~~
+   - ~~Add sections for the following topics in *Concept/NTI Clean Model.md*:~~
+     - ~~**NTI Minting Proofing Bootstrap**~~
+     - ~~**Non-Transferable Operational Definition**~~
+     - ~~**Avatar As Visual Identifier (Not Enforcement Authority)**~~
+     - ~~**Life-Stage Evolution**~~
+     - ~~**Post-MVP Platform Integration**~~
+   - ~~Use the following commands to edit:~~
      - ~~`code Concept/NTI Clean Model.md`~~
 
 4. ~~**Update Index File**~~  
@@ -60,5 +60,7 @@
 - Created deployment scenario docs (`Docs/deployment/scenario-3.md` .. `scenario-6.md`) and normalized scenario filenames to hyphenated style.
 - Normalized Concept filenames where sensible (e.g., `NTI Clean Model.md`) and updated internal references; left numbered-prefix files (`00_INDEX.md`) unchanged.
 - Committed and pushed all edits to `main` (multiple commits) so GitHub now hosts the updated docs.
+
+- Added NTI minting prototype and demo: Express mock server, `mint-test-nti` CLI, OpenAPI spec, provider onboarding checklist, demo runner (`scripts/demo/run-mint-demo.ps1`), and updated demo docs; demo validates `non_transferable` and `avatar_claim`.
 
 If you want a one-line changelog entry for release notes, I can add it to `Concept/CHANGELOG.md`.

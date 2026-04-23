@@ -121,3 +121,26 @@ Apps cannot:
 This NTI system is a personal data governance layer intended to act as infrastructure across social and non-social apps. The `Social Hub` will be the first deployment target (schools and clubs) to validate avatar and NTI flows; the NTI/Avatar API will be the template for other social apps and websites to integrate.
 
 Keep enforcement boundaries and simplicity as primary design constraints to avoid permission explosion and silent consent drift.
+
+## Additional Operational Sections
+
+### NTI Minting Proofing Bootstrap
+
+Describe the minimal secure bootstrap flow for creating an NTI. Include obligations for proofing (age, device binding), entropy sources, and recovery mechanisms. This section should list required checks and the expected audit events emitted during minting.
+
+### Non-Transferable Operational Definition
+
+Define operational rules that ensure NTIs remain non-transferable. Include cryptographic binding details, account recovery policies, and explicit checks preventing credential export/import flows.
+
+### Avatar As Visual Identifier (Not Enforcement Authority)
+
+Clarify that avatars are the UI/UX representation of NTI state only; they are not authority components that can change permission or consent. Provide examples of acceptable avatar actions (display, limited session claims) and prohibited actions (escalation of permissions).
+
+### Life-Stage Evolution
+
+Outline how NTI consent and capability axes evolve across user life-stages (e.g., toddler → child → adolescent). Define migration paths, required reproofing, and rules for automatic decay or escalation tied to verified life-stage changes.
+
+### Post-MVP Platform Integration
+
+Roadmap notes for integrating NTI into larger platforms post-MVP. Include compatibility notes (APIs, data contracts), required migrations, and suggested governance patterns for platform partners.
+

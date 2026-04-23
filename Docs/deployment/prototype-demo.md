@@ -68,3 +68,11 @@ Then start policy-service with postgres mode variables as printed by that script
 ## Stakeholder Walkthrough
 
 See [prototype-demo-talk-track.md](prototype-demo-talk-track.md) for a guided talk script that explains each scenario and connects it to SiGear's product promise.
+
+## Acceptance Criteria
+
+- Describe acceptance criteria for this prototype demo here.
+- Demonstrates the five scenarios produce expected allow/deny decisions.
+- Audit events are written and contain required metadata.
+- No external DB required; script runs and exits cleanly.
+

@@ -68,3 +68,11 @@ node packages/shared/policy-eval/demo/mobile_approve.js packages/shared/policy-e
 
 ***
 For a guided talk script, see [prototype-demo-talk-track-2.md](prototype-demo-talk-track-2.md).
+
+## Acceptance Criteria
+
+- Describe acceptance criteria for this prototype demo here.
+- NTI denies unknown default-on options and emits pending unknown audit events.
+- Admin pending endpoint exposes discoverable events for review.
+- Demo scripts run without DB and exit cleanly.
+

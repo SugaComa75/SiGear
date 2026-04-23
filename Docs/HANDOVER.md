@@ -82,3 +82,12 @@ Updated next steps (short list)
 4. Optional: publish a Grafana dashboard JSON using queries in `Docs/observability/reason_codes_queries.md` to visualize `reason_codes` trends.
 5. Generate SDK/client adapters from updated OpenAPI contracts and publish examples for browser enforcement using `packages/shared/policy-eval`.
 
+
+Outstanding items moved from `Docs/correction_path.md`
+-- The following remaining tasks were moved here from `Docs/correction_path.md` and should be treated as handover action items:
+- `Commit changelog update` — Commit and push the one-line changelog entry in `Concept/CHANGELOG.md` (TODO in repo).
+- `Review NTI minting draft with user and iterate` — Review the drafted NTI minting bootstrap and iterate on proofing tiers, recovery, and audit requirements; track decisions in `Concept/NTI Clean Model.md`.
+
+Archive note
+- `Docs/correction_path.md` has been archived to [Docs/archive/correction_path_archived.md](Docs/archive/correction_path_archived.md). The above outstanding items were moved into this handover document for tracking and completion.
+

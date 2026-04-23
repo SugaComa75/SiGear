@@ -2,6 +2,12 @@
 
 - [Digital Safety Concept](digital_safety_concept.md)
 
+**Terminology — Canonical Definition**
+
+Neutral Trusted Identity (NTI) — a neutral, trusted, cryptographically-bound digital identity that is non-transferable and treated as a governed asset for consent, audit, and lifecycle management. "Non-transferable" is an explicit property of an NTI, not the primary name.
+
+Synonyms: Non-Transferable Identity; Non-Transferable Asset (governance framing).
+
 ## Concept Version
 0.2
 

@@ -1,3 +1,13 @@
+# Digital Safety Concept
+
+## Overview
+For our purposes, digital safety encompasses the policies, architecture, and operational controls that protect children and families while enabling useful features.
+
+## Terminology — Canonical Definition
+
+Neutral Trusted Identity (NTI): a neutral, trusted, cryptographically-bound digital identity that is non-transferable and treated as a governed asset for consent, audit, and lifecycle management. "Non-transferable" is an explicit property of an NTI, not the primary name.
+
+Synonyms: Non-Transferable Identity; Non-Transferable Asset (governance framing).
 # SIGEAR – CyGear
 
 ### Social Internet Governance Educator And Relay

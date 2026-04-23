@@ -11,11 +11,11 @@
 
 3. ~~**Update NTI Clean Model**~~
    - ~~Add sections for the following topics in *Concept/NTI Clean Model.md*:~~
-     - ~~**NTI Minting Proofing Bootstrap**~~
-     - ~~**Non-Transferable Operational Definition**~~
-     - ~~**Avatar As Visual Identifier (Not Enforcement Authority)**~~
-     - ~~**Life-Stage Evolution**~~
-     - ~~**Post-MVP Platform Integration**~~
+     - ~~NTI Minting Proofing Bootstrap~~
+     - ~~Non-Transferable Operational Definition~~
+     - ~~Avatar As Visual Identifier (Not Enforcement Authority)~~
+     - ~~Life-Stage Evolution~~
+     - ~~Post-MVP Platform Integration~~
    - ~~Use the following commands to edit:~~
      - ~~`code Concept/NTI Clean Model.md`~~
 
@@ -45,22 +45,21 @@
   - Describe acceptance criteria here.' > Docs/deployment/scenario-3.md`~~  
     - ~~Repeat for scenarios 4 to 6.~~
 
----
 
 ### Suggested Commit Message:
 "Updated concept files, archived duplicates, and added acceptance criteria in deployment docs."
 
 ## Completed (2026-04-23)
 
-- Imported and merged external changes into `main`.
-- Added `packages/backend/services/policy-service/src/jwks-rsa.d.ts` and removed unavailable `@types/jwks-rsa`; updated `package-lock.json` and verified `npm ci` locally.
-- Canonicalized the Digital Safety Concept (`Concept/Digital Safety Concept.md`) and archived duplicates to `Concept/archive/`.
-- Created `Concept/TERMINOLOGY.md`, added `Avatar`, `Consent Anchor`, and `Lifecycle` entries, and linked terminology from `Concept/00_INDEX.md`.
-- Created `Concept/CHANGELOG.md` and `Concept/archive/README.md` and committed archive copies.
-- Created deployment scenario docs (`Docs/deployment/scenario-3.md` .. `scenario-6.md`) and normalized scenario filenames to hyphenated style.
-- Normalized Concept filenames where sensible (e.g., `NTI Clean Model.md`) and updated internal references; left numbered-prefix files (`00_INDEX.md`) unchanged.
-- Committed and pushed all edits to `main` (multiple commits) so GitHub now hosts the updated docs.
+## Completed (2026-04-23)
 
-- Added NTI minting prototype and demo: Express mock server, `mint-test-nti` CLI, OpenAPI spec, provider onboarding checklist, demo runner (`scripts/demo/run-mint-demo.ps1`), and updated demo docs; demo validates `non_transferable` and `avatar_claim`.
+- Canonicalized `Concept/Digital Safety Concept.md` and archived duplicates to `Concept/archive/`.
+- Created `Concept/TERMINOLOGY.md` and updated `Concept/00_INDEX.md` to reference terminology.
+- Created `Concept/CHANGELOG.md` and `Concept/archive/README.md`.
+- Created deployment scenario docs (`Docs/deployment/scenario-3.md` .. `scenario-6.md`) and normalized filenames.
+- Drafted and added `Concept/NTI_Minting_API_Spec.md` and `Concept/NTI_Minting_OpenAPI.yaml`.
+- Added `Concept/NTI_Provider_Onboarding_Checklist.md`.
+- Implemented sandbox tooling: `scripts/mint-mock-server` (mock server) and `scripts/mint-test-nti` (CLI) with README.
+- Added demo runner `scripts/demo/run-mint-demo.ps1` and demo docs (`Docs/deployment/prototype-minting-demo.md`, `prototype-minting-demo-talk-track.md`).
 
 If you want a one-line changelog entry for release notes, I can add it to `Concept/CHANGELOG.md`.

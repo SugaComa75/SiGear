@@ -1,6 +1,6 @@
 # Archived: Digital Safety Concept
 
-This file is an archived copy of the older "Digital Safety Concept" document. The canonical concept is now `Concept/Digital_Safety_Concept.md`.
+This file is an archived copy of the older "Digital Safety Concept" document. The canonical concept is now `Concept/Digital Safety Concept.md`.
 
 --- archived content below ---
 
@@ -23,4 +23,4 @@ This identity is paired with a personalised **adaptive avatar**, which acts as t
 ---
 
 *(truncated for archive — full historical content preserved here)*
-This file is archived and points to Concept/digital_safety_concept.md
+This file is archived and points to Concept/Digital Safety Concept.md

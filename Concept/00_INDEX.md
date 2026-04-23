@@ -1,6 +1,6 @@
 # Index
 
-- [Digital Safety Concept](digital_safety_concept.md)
+- [Digital Safety Concept](Digital Safety Concept.md)
  - [Terminology](TERMINOLOGY.md)
 
 **Terminology — Canonical Definition**

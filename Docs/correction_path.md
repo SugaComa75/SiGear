@@ -1,13 +1,13 @@
 # Step-by-Step Instructions for GitHub Copilot in VS Code
 
 1. **Canonicalize the Digital Safety Concept File**  
-   - Move the file *Concept/digital_safety_concept.md* to ensure it exists as **lowercase**:  
-     - `mv Concept/digital_safety_concept.md Concept/digital_safety_concept.md`
+   - Move the file *Concept/Digital Safety Concept.md* to ensure it exists as the canonical name:  
+     - (Already canonicalized to `Concept/Digital Safety Concept.md`)
 
 2. **Archive Duplicate Concept Files**  
    - Identify any duplicates and create stub pointer headers. For each duplicate:  
      - Create a new file in `Concept/archive/` with a pointer to the canonical file:
-       - `echo 'This file is archived and points to Concept/digital_safety_concept.md' > Concept/archive/<duplicate_file_name>_archived.md`
+      - `echo 'This file is archived and points to Concept/Digital Safety Concept.md' > Concept/archive/<duplicate_file_name>_archived.md`
 
 3. **Update NTI-Clean-Model**  
    - Add sections for the following topics in *Concept/NTI-Clean-Model.md*:  
@@ -21,7 +21,7 @@
 
 4. **Update Index File**  
    - Ensure that *Concept/00_INDEX.md* points to the canonical file:  
-     - `echo 'See Concept/digital_safety_concept.md' >> Concept/00_INDEX.md`
+    - `echo 'See Concept/Digital Safety Concept.md' >> Concept/00_INDEX.md`
    - Include placeholders for invariants/glossary:  
      - `echo '## Invariants
 

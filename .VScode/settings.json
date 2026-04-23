@@ -1,1 +1,12 @@
-
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cd packages/backend/services/policy-service ; npx tsc -p tsconfig\\.json$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node dist/test/evaluate\\.test\\.js$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

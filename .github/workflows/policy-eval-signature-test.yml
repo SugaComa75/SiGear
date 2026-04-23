@@ -1,0 +1,26 @@
+name: Policy Eval Signature Test
+
+on:
+  push:
+    paths:
+      - 'packages/shared/policy-eval/**'
+  pull_request:
+    paths:
+      - 'packages/shared/policy-eval/**'
+
+jobs:
+  signature-test:
+    name: Run signature verification test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Run signature verification unit test
+        run: |
+          node packages/shared/policy-eval/test/verify.test.js

@@ -76,6 +76,44 @@ CREATE TABLE refresh_tokens (
   user_agent VARCHAR(512)
 );
 
+CREATE TABLE policy_rules (
+  id UUID PRIMARY KEY,
+  version INTEGER NOT NULL DEFAULT 1,
+  allowed_purposes TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  retention JSONB,
+  derivative_policy TEXT,
+  capability_axes JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE policy_consents (
+  id UUID PRIMARY KEY,
+  identity_id VARCHAR(255) NOT NULL,
+  rule_id UUID NOT NULL REFERENCES policy_rules(id) ON DELETE CASCADE,
+  state VARCHAR(32) NOT NULL CHECK (state IN ('active', 'reminder', 'dormant', 'recovery', 'archive', 'deleted')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ
+);
+
+CREATE TABLE policy_audit_events (
+  id UUID PRIMARY KEY,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  identity_id VARCHAR(255) NOT NULL,
+  action VARCHAR(128) NOT NULL,
+  purpose VARCHAR(128),
+  rule_id UUID,
+  rule_version INTEGER,
+  consent_id UUID,
+  consent_state VARCHAR(32),
+  allowed BOOLEAN NOT NULL,
+  reasons TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  reason_codes TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  unknown_requested_axes TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  unapproved_requested_axes TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  payload JSONB NOT NULL DEFAULT '{}'::jsonb
+);
+
 CREATE TABLE audit_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   action VARCHAR(255) NOT NULL,
@@ -92,4 +130,6 @@ CREATE INDEX idx_identities_child_user_id ON identities(child_user_id);
 CREATE INDEX idx_policies_identity_id ON policies(identity_id);
 CREATE INDEX idx_devices_identity_id ON devices(identity_id);
 CREATE INDEX idx_refresh_tokens_user_id ON refresh_tokens(user_id);
+CREATE INDEX idx_policy_consents_identity_id_created_at ON policy_consents(identity_id, created_at DESC);
+CREATE INDEX idx_policy_audit_events_identity_id_created_at ON policy_audit_events(identity_id, created_at DESC);
 CREATE INDEX idx_audit_logs_actor_user_id_created_at ON audit_logs(actor_user_id, created_at DESC);

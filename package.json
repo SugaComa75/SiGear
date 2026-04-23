@@ -13,6 +13,8 @@
     "build": "npm run build --workspaces --if-present",
     "dev": "npm run dev --workspace @sigear/auth-service",
     "lint": "npm run lint --workspaces --if-present",
+    "policy:postgres:switch": "powershell -ExecutionPolicy Bypass -File ./scripts/policy-postgres-switch.ps1",
+    "prototype:demo": "npm run prototype --workspace @sigear/policy-service",
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },

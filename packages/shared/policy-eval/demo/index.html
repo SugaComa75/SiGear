@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>policy-eval demo</title>
+  <style>body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:16px}textarea{width:100%;height:120px}</style>
+</head>
+<body>
+  <h1>policy-eval demo</h1>
+  <p>Upload an NTI avatar JSON (rules + consents arrays) and run a sample evaluation.</p>
+  <input id="file" type="file" accept="application/json" />
+  <p>
+    <label>Request JSON</label>
+    <textarea id="req">{ "identityId": "user:children:alpha", "action": "activate", "purpose": "X", "context": { "requestedCapabilityAxes": { "A": "enabled", "B": "enabled" } } }</textarea>
+  </p>
+  <button id="run">Run Evaluation</button>
+  <h2>Decision</h2>
+  <pre id="out"></pre>
+  <h2>Signature</h2>
+  <pre id="sig"></pre>
+
+  <script type="module">
+    import { evaluateFromAvatar } from '../index.js';
+
+    const fileInput = document.getElementById('file');
+    const runBtn = document.getElementById('run');
+    const out = document.getElementById('out');
+    let avatar = null;
+
+    fileInput.addEventListener('change', async (e) => {
+      const f = e.target.files[0];
+      if (!f) return;
+      avatar = JSON.parse(await f.text());
+      out.textContent = 'Loaded avatar with ' + (avatar.rules ? avatar.rules.length : 0) + ' rule(s) and ' + (avatar.consents ? avatar.consents.length : 0) + ' consent(s)';
+    });
+
+    runBtn.addEventListener('click', async () => {
+      try {
+        if (!avatar) { out.textContent = 'Please upload an avatar JSON first.'; return; }
+        const req = JSON.parse(document.getElementById('req').value);
+        const sigOut = document.getElementById('sig');
+        if (typeof verifySignedAvatar === 'function') {
+          const v = await verifySignedAvatar(avatar);
+          sigOut.textContent = JSON.stringify(v, null, 2);
+        }
+        const decision = evaluateFromAvatar(avatar, req);
+        out.textContent = JSON.stringify(decision, null, 2);
+      } catch (err) {
+        out.textContent = 'Error: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

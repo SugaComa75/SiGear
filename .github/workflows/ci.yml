@@ -46,3 +46,34 @@ jobs:
 
       - name: Build workspaces
         run: npm run build
+
+  backend-quality-gates:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        workspace:
+          - "@sigear/auth-service"
+          - "@sigear/policy-service"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint service
+        run: npm run lint --workspace ${{ matrix.workspace }}
+
+      - name: Test service
+        run: npm run test --workspace ${{ matrix.workspace }}
+
+      - name: Build service
+        run: npm run build --workspace ${{ matrix.workspace }}

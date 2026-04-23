@@ -40,9 +40,9 @@
    - Describe acceptance criteria here.' >> Docs/deployment/prototype-demo-2.md`
 
 7. **Create Scenario Docs**  
-   - Create *Docs/deployment/scenario_3.md*, *scenario_4.md*, *scenario_5.md*, and *scenario_6.md* containing the acceptance criteria:
+  - Create *Docs/deployment/scenario-3.md*, *scenario-4.md*, *scenario-5.md*, and *scenario-6.md* containing the acceptance criteria:
      - `echo '## Acceptance Criteria
-   - Describe acceptance criteria here.' > Docs/deployment/scenario_3.md`  
+  - Describe acceptance criteria here.' > Docs/deployment/scenario-3.md`  
      - Repeat for scenarios 4 to 6.
 
 ---

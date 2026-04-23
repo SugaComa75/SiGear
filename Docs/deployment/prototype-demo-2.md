@@ -71,8 +71,9 @@ For a guided talk script, see [prototype-demo-talk-track-2.md](prototype-demo-ta
 
 ## Acceptance Criteria
 
-- Describe acceptance criteria for this prototype demo here.
-- NTI denies unknown default-on options and emits pending unknown audit events.
-- Admin pending endpoint exposes discoverable events for review.
-- Demo scripts run without DB and exit cleanly.
+- Command `npm run prototype:demo2` completes with exit code 0.
+- When options A/B/C are unknown/unapproved, the service denies activation and records `unknownRequestedAxes` in audit events.
+- The admin pending endpoint `/v1/admin/pending-unknown` exposes the pending unknown audit events for review and contains sufficient metadata (NTI, request, axes, timestamp).
+- The avatar-based demo shows deny reasons locally, and the mobile approval simulator updates the avatar to allow the same request after approval.
+- Demo scripts run without a database and print summary output suitable for smoke tests.
 

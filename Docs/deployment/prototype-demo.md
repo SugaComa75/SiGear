@@ -71,8 +71,14 @@ See [prototype-demo-talk-track.md](prototype-demo-talk-track.md) for a guided ta
 
 ## Acceptance Criteria
 
-- Describe acceptance criteria for this prototype demo here.
-- Demonstrates the five scenarios produce expected allow/deny decisions.
-- Audit events are written and contain required metadata.
-- No external DB required; script runs and exits cleanly.
+- Command `npm run prototype:demo` completes with exit code 0.
+- Demonstrates the five scenarios with these expected outcomes:
+	- Safe social connection request -> allow
+	- Model training request -> deny
+	- Dormant lifecycle write attempt -> deny
+	- Recovery without re-authentication -> deny
+	- Recovery with re-authentication -> allow
+- Each decision produces an audit event containing: timestamp, NTI identifier, request payload, decision, and reason codes.
+- Script runs without a database and prints a summary (decisions + audit count).
+- Exit status and printed summary are suitable for inclusion in automated demos or CI smoke tests.
 

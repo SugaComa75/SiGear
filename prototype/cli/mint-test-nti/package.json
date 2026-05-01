@@ -1,0 +1,10 @@
+{
+  "name": "mint-test-nti",
+  "version": "0.1.0",
+  "bin": {
+    "mint-test-nti": "cli.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

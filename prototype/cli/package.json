@@ -1,0 +1,10 @@
+{
+  "name": "sigear-prototype-cli",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Minimal deps for SiGear prototype CLI (mock server)",
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}

@@ -61,4 +61,11 @@ services:
       - redis
 
 volumes:
+      sigear-cli:
+        image: node:18-alpine
+        working_dir: /workspace
+        volumes:
+          - ./:/workspace:cached
+        entrypoint: ["node", "/workspace/prototype/cli/cli.js"]
+        command: ["demo"]
   postgres_data:

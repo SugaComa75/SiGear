@@ -1,0 +1,6 @@
+{
+  "rules": [
+    { "id": "r1", "action": "allow", "domain": "example.com" },
+    { "id": "r2", "action": "block", "domain": "bad.example" }
+  ]
+}

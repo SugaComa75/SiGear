@@ -1,0 +1,11 @@
+{
+  "id": "demo-consent-001",
+  "identityId": "user:1234",
+  "ruleId": "8a7f9f2c-3b6f-4c1e-9a2f-0f1d2c3b4e5f",
+  "state": "active",
+  "provenance": {
+    "method": "demo",
+    "via": "script"
+  },
+  "createdAt": "2026-05-27T10:10:15.355Z"
+}

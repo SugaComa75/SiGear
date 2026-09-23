@@ -1,0 +1,29 @@
+{
+  "name": "sigear",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SiGear identity, consent and safety platform",
+  "engines": {
+    "node": ">=18.12.0"
+  },
+  "workspaces": [
+    "apps/identity-and-minting/service",
+    "apps/site-integration/policy-service",
+    "apps/home-app/sync-service",
+    "shared/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "dev": "npm run dev --workspace @sigear/auth-service",
+    "lint": "npm run lint --workspaces --if-present",
+    "poc:install": "npm install --prefix proof-of-concept/cli",
+    "poc:cli": "node proof-of-concept/cli/cli.js demo",
+    "policy:postgres:switch": "powershell -ExecutionPolicy Bypass -File ./scripts/policy-postgres-switch.ps1",
+    "prototype:demo": "npm run prototype --workspace @sigear/policy-service",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

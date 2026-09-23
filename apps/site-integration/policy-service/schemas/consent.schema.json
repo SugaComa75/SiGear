@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NTI Consent Record",
+  "type": "object",
+  "required": ["id","identityId","ruleId","state","createdAt"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "identityId": { "type": "string" },
+    "ruleId": { "type": "string", "format": "uuid" },
+    "state": { "type": "string", "enum": ["active","reminder","dormant","recovery","archive","deleted"] },
+    "provenance": { "type": "object" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": ["string","null"], "format": "date-time" },
+    "metadata": { "type": "object" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,21 @@
+{
+  "id": "8a7f9f2c-3b6f-4c1e-9a2f-0f1d2c3b4e5f",
+  "version": 1,
+  "scope": "identity",
+  "scopeRef": "user:1234",
+  "capabilityAxes": {
+    "identity_linkage": "pseudonymous",
+    "storage_duration": "time_limited",
+    "derivative_creation": "aggregation",
+    "purpose_scope": "related",
+    "cross_service_sharing": "ecosystem",
+    "monetisation_use": "prohibited",
+    "transparency_level": "summary_only"
+  },
+  "allowedPurposes": ["social_connection","safety_moderation"],
+  "retention": { "maxDays": 365, "conditions": "Deleted on user request or after inactivity" },
+  "derivativePolicy": "No model training allowed; aggregation for analytics only.",
+  "createdBy": "parent:abcd",
+  "createdAt": "2026-04-20T10:00:00Z",
+  "description": "Default child account rule limiting derivatives and monetisation"
+}

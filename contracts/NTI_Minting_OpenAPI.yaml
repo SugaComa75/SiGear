@@ -1,0 +1,195 @@
+openapi: 3.1.0
+info:
+  title: NTI Minting API
+  version: 0.1.0
+  description: Concise OpenAPI spec for sandbox and production NTI minting endpoints.
+servers:
+  - url: https://mint.sandbox.nti.example
+    description: Sandbox (test anchors allowed)
+  - url: https://mint.nti.example
+    description: Production (trusted anchors only)
+
+paths:
+  /v1/mint:
+    post:
+      summary: Create a new NTI (mint)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MintRequest'
+      responses:
+        '201':
+          description: NTI created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MintResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+      security:
+        - ApiKeyAuth: []
+        - OAuth2ClientCredentials: []
+
+  /v1/mint/{nti_id}:
+    get:
+      summary: Retrieve non-sensitive NTI metadata
+      parameters:
+        - name: nti_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: NTI metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MintResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Not found
+      security:
+        - ApiKeyAuth: []
+        - OAuth2ClientCredentials: []
+
+  /v1/mint/{nti_id}/reproof:
+    post:
+      summary: Trigger reproof for an existing NTI
+      parameters:
+        - name: nti_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReproofRequest'
+      responses:
+        '202':
+          description: Reproof initiated
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - OAuth2ClientCredentials: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Sandbox API key ("ApiKey <key>")'
+    OAuth2ClientCredentials:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: 'https://auth.example/oauth2/token'
+    MutualTLS:
+      type: mutualTLS
+
+  responses:
+    BadRequest:
+      description: Invalid request
+    Unauthorized:
+      description: Authentication required or failed
+    Forbidden:
+      description: Forbidden (e.g., sandbox cannot request high-tier minting)
+    Conflict:
+      description: Conflict (e.g., duplicate key)
+
+  schemas:
+    PublicKeyJWK:
+      type: object
+      description: JWK representation of the public key (freeform)
+
+    ProofDocument:
+      type: object
+      properties:
+        type:
+          type: string
+          description: 'gov_id|email_otp|vc|other'
+        hash:
+          type: string
+        meta:
+          type: object
+
+    RecoveryOptions:
+      type: object
+      properties:
+        backup_encrypted:
+          type: boolean
+        guardian_ids:
+          type: array
+          items:
+            type: string
+
+    MintRequest:
+      type: object
+      required: [proofing_tier, public_key_jwk]
+      properties:
+        proofing_tier:
+          type: string
+          enum: [low, medium, high]
+        public_key_jwk:
+          $ref: '#/components/schemas/PublicKeyJWK'
+        device_attestation:
+          type: object
+        proof_documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProofDocument'
+        recovery_options:
+          $ref: '#/components/schemas/RecoveryOptions'
+        environment:
+          type: string
+          enum: [sandbox, production]
+
+    MintResponse:
+      type: object
+      properties:
+        nti_id:
+          type: string
+        public_key_jwk:
+          $ref: '#/components/schemas/PublicKeyJWK'
+        proofing_tier:
+          type: string
+        policy_seed_hash:
+          type: string
+        capabilities:
+          type: object
+        audit_event_id:
+          type: string
+
+    ReproofRequest:
+      type: object
+      properties:
+        requested_tier:
+          type: string
+          enum: [low, medium, high]
+        proof_documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProofDocument'
+
+  examples:
+    MintRequestExample:
+      summary: Sandbox example
+      value:
+        proofing_tier: low
+        public_key_jwk: { "kty": "EC", "crv": "P-256", "x": "...", "y": "..." }
+        recovery_options: { backup_encrypted: true }

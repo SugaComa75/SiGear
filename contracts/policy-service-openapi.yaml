@@ -1,0 +1,85 @@
+openapi: 3.0.3
+info:
+  title: SiGear Policy Service API
+  version: 0.1.0
+paths:
+  /v1/evaluate:
+    post:
+      summary: Evaluate a requested action against NTI rules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                identityId:
+                  type: string
+                action:
+                  type: string
+                purpose:
+                  type: string
+                context:
+                  type: object
+                  properties:
+                    reauthenticated:
+                      type: boolean
+                    monetised:
+                      type: boolean
+                    requestedRetentionDays:
+                      type: integer
+                    requestedCapabilityAxes:
+                      type: object
+                      properties:
+                        identity_linkage:
+                          type: string
+                          enum: [anonymous, pseudonymous, identifiable]
+                        storage_duration:
+                          type: string
+                          enum: [session, time_limited, long_term]
+                        derivative_creation:
+                          type: string
+                          enum: [none, aggregation, model_training, synthetic_reuse]
+                        purpose_scope:
+                          type: string
+                          enum: [single, related, general_improvement]
+                        cross_service_sharing:
+                          type: string
+                          enum: [isolated, ecosystem, unrestricted]
+                        monetisation_use:
+                          type: string
+                          enum: [prohibited, indirect, commercial]
+                        transparency_level:
+                          type: string
+                          enum: [full_audit, summary_only, system_only]
+      responses:
+        '200':
+          description: Decision response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      allowed:
+                        type: boolean
+                      reasons:
+                        type: array
+                        items:
+                          type: string
+                      obligations:
+                        type: object
+                      audit:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          timestamp:
+                            type: string
+                            format: date-time
+                  error:
+                    type: object

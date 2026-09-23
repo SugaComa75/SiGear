@@ -1,0 +1,12 @@
+LICENSE
+LICENSE-AGPLv3.txt
+README.md
+SECURITY.md
+apps
+contracts
+docker-compose.yml
+infrastructure/database
+package-lock.json
+package.json
+shared
+tsconfig.base.json

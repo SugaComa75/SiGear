@@ -1,0 +1,312 @@
+openapi: 3.1.0
+info:
+  title: SiGear Sandbox Claim Service
+  version: 1.2.0
+  description: Single-use Avatar claim, one-Avatar Personal view, and multi-Avatar Family Hub API used by the file-deployable sandbox website.
+servers:
+  - url: /api/index.php?route=
+    description: Same-origin PHP entry point; append the URL-encoded route value.
+paths:
+  /health:
+    get:
+      summary: Report service and private-storage health
+      responses:
+        '200':
+          description: Service is ready
+  /v1/mint:
+    post:
+      summary: Mint a sandbox Avatar and create a 15-minute single-use claim
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MintRequest'
+      responses:
+        '201':
+          description: Claim created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MintResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          description: Mint rate limit exceeded
+  /v1/claims/{token}/preview:
+    get:
+      summary: Preview a claim without consuming it
+      parameters:
+        - $ref: '#/components/parameters/ClaimToken'
+      responses:
+        '200':
+          description: Safe Avatar preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimPreview'
+        '404':
+          description: Claim not found
+        '409':
+          description: Claim already used
+        '410':
+          description: Claim expired
+  /v1/claims/{token}/accept:
+    post:
+      summary: Consume a claim and bind its Avatar to one Family Hub
+      parameters:
+        - $ref: '#/components/parameters/ClaimToken'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hub_id]
+              properties:
+                hub_id:
+                  type: string
+                  pattern: '^hub-[A-Za-z0-9-]{20,80}$'
+      responses:
+        '200':
+          description: Avatar bound; binding_token is returned once for local secure storage
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BindingResult'
+        '409':
+          description: Claim used or Avatar already bound
+      security:
+        - HubIdHeader: []
+          DeviceIdHeader: []
+          DeviceTokenHeader: []
+  /v1/hubs:
+    post:
+      summary: Create a Family Hub and register its first device
+      responses:
+        '201':
+          description: Hub and device credential created
+  /v1/hubs/bootstrap:
+    post:
+      summary: Upgrade a legacy local Hub using an existing Avatar binding credential
+      responses:
+        '201':
+          description: Hub upgraded and first device credential created
+  /v1/hubs/{hub_id}/members:
+    get:
+      summary: Synchronise active Avatar members and preferences to an authorised device
+      parameters:
+        - $ref: '#/components/parameters/HubId'
+      responses:
+        '200':
+          description: Family Hub member list, including this device's one personal_avatar_id
+      security:
+        - HubIdHeader: []
+          DeviceIdHeader: []
+          DeviceTokenHeader: []
+  /v1/hubs/{hub_id}/pairings:
+    post:
+      summary: Create a ten-minute single-use device pairing invitation
+      parameters:
+        - $ref: '#/components/parameters/HubId'
+      responses:
+        '201':
+          description: Pairing invitation created
+      security:
+        - HubIdHeader: []
+          DeviceIdHeader: []
+          DeviceTokenHeader: []
+  /v1/devices/personal-avatar:
+    put:
+      summary: Select the one Family Hub Avatar shown in Personal on this authorised device
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [avatar_id]
+              properties:
+                avatar_id:
+                  type: string
+                  pattern: '^avatar-[A-Za-z0-9-]{20,80}$'
+      responses:
+        '200':
+          description: Device personal Avatar selection saved
+        '403':
+          description: Avatar is not an active member of this Family Hub
+      security:
+        - HubIdHeader: []
+          DeviceIdHeader: []
+          DeviceTokenHeader: []
+  /v1/pairings/{token}/preview:
+    get:
+      summary: Preview a Family Hub pairing invitation
+      parameters:
+        - $ref: '#/components/parameters/PairingToken'
+      responses:
+        '200':
+          description: Pairing invitation is valid
+  /v1/pairings/{token}/accept:
+    post:
+      summary: Join a device to a Hub and merge its existing local Hub members when authenticated
+      parameters:
+        - $ref: '#/components/parameters/PairingToken'
+      responses:
+        '200':
+          description: Device joined and device-specific credential returned
+  /v1/bindings/{avatar_id}/preferences:
+    put:
+      summary: Replace safety preferences for an active Family Hub binding
+      parameters:
+        - $ref: '#/components/parameters/AvatarId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreferenceUpdate'
+      responses:
+        '200':
+          description: Preferences saved
+        '401':
+          description: Invalid binding credentials
+      security:
+        - HubIdHeader: []
+          DeviceIdHeader: []
+          DeviceTokenHeader: []
+  /v1/bindings/{avatar_id}/release:
+    post:
+      summary: Release an Avatar from its active Family Hub
+      parameters:
+        - $ref: '#/components/parameters/AvatarId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Binding released
+        '401':
+          description: Invalid binding credentials
+      security:
+        - HubIdHeader: []
+          DeviceIdHeader: []
+          DeviceTokenHeader: []
+components:
+  securitySchemes:
+    HubIdHeader:
+      type: apiKey
+      in: header
+      name: X-SiGear-Hub-Id
+    DeviceIdHeader:
+      type: apiKey
+      in: header
+      name: X-SiGear-Device-Id
+    DeviceTokenHeader:
+      type: apiKey
+      in: header
+      name: X-SiGear-Device-Token
+  parameters:
+    ClaimToken:
+      name: token
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^[A-Za-z0-9_-]{20,128}$'
+    AvatarId:
+      name: avatar_id
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^avatar-[A-Za-z0-9-]{20,80}$'
+    HubId:
+      name: hub_id
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^hub-[A-Za-z0-9-]{20,80}$'
+    PairingToken:
+      name: token
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^[A-Za-z0-9_-]{20,128}$'
+  responses:
+    BadRequest:
+      description: Input validation failed
+  schemas:
+    PublicKeyJwk:
+      type: object
+      required: [kty, crv, x, y]
+      properties:
+        kty: {const: EC}
+        crv: {const: P-256}
+        x: {type: string}
+        y: {type: string}
+    MintRequest:
+      type: object
+      required: [display_name, avatar, proofing_tier, public_key_jwk]
+      properties:
+        display_name: {type: string, minLength: 1, maxLength: 40}
+        avatar: {type: string, enum: [guardian, explorer, companion]}
+        proofing_tier: {type: string, enum: [low, medium]}
+        public_key_jwk: {$ref: '#/components/schemas/PublicKeyJwk'}
+    MintResult:
+      type: object
+      required: [claim_token, claim_id, nti_id, avatar_id, display_name, expires_at]
+      properties:
+        claim_token: {type: string, writeOnly: true}
+        claim_id: {type: string}
+        nti_id: {type: string}
+        avatar_id: {type: string}
+        display_name: {type: string}
+        expires_at: {type: string, format: date-time}
+    PublicIdentity:
+      type: object
+      required: [environment, test, nti_id, avatar_id, display_name, avatar, proofing_tier]
+      properties:
+        environment: {const: sandbox}
+        test: {const: true}
+        nti_id: {type: string}
+        avatar_id: {type: string}
+        display_name: {type: string}
+        avatar: {type: string, enum: [guardian, explorer, companion]}
+        avatar_image: {type: string}
+        proofing_tier: {type: string, enum: [low, medium]}
+        capabilities: {type: object}
+        created_at: {type: string, format: date-time}
+    ClaimPreview:
+      type: object
+      properties:
+        claim_id: {type: string}
+        identity: {$ref: '#/components/schemas/PublicIdentity'}
+        expires_at: {type: string, format: date-time}
+        status: {const: available}
+    Preferences:
+      type: object
+      required: [safe_social, monetisation, cross_service_sharing, approval_required_for_new_sites]
+      properties:
+        safe_social: {type: boolean}
+        monetisation: {type: boolean}
+        cross_service_sharing: {type: boolean}
+        approval_required_for_new_sites: {type: boolean}
+    PreferenceUpdate:
+      type: object
+      required: [preferences]
+      properties:
+        preferences: {$ref: '#/components/schemas/Preferences'}
+    BindingResult:
+      type: object
+      properties:
+        identity: {$ref: '#/components/schemas/PublicIdentity'}
+        binding_token: {type: string, writeOnly: true}
+        binding_status: {const: active}
+        preferences: {$ref: '#/components/schemas/Preferences'}
+        bound_at: {type: string, format: date-time}

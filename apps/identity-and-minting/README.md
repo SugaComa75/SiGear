@@ -13,7 +13,8 @@ This element authorises an adult, guardian, or child enrolment and mints the SiG
 
 - `service/` is the TypeScript authentication/token service.
 - The canonical API definitions are `../../contracts/auth-service-openapi.yaml` and `../../contracts/NTI_Minting_OpenAPI.yaml`.
+- `../../contracts/claim-service-openapi.yaml` defines the file-deployable sandbox claim and Personal Hub binding flow.
 - The runnable minting and age-passport experiments are isolated in `../../proof-of-concept/cli/`.
-- The static public demonstration is `../../../Website-Files/sigear.sprint-family/public_html/SiGear-Mint/`.
+- The working website sandbox is under `../../../Website-Files/sigear.sprint-family/`; its PHP claim service keeps code and runtime data outside `public_html`.
 
 The proof-of-concept keys and proofing tiers are test material only and must not be reused in production.

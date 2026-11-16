@@ -16,6 +16,6 @@ The home app is the user-controlled centre for personal and family settings.
 - `web/shared-ui/` reserves reusable home-app components.
 - `desktop/` reserves packaged desktop clients.
 - `sync-service/` is the TypeScript synchronisation service.
-- The static public demonstration is `../../../Website-Files/sigear.sprint-family/public_html/SiGear-Personal/`.
+- The working website sandbox is `../../../Website-Files/sigear.sprint-family/public_html/SiGear-Personal/`, backed by the private sandbox claim/binding service beside `public_html`.
 
 Parental controls must remain explainable to both guardian and child, support more than one guardian where required, and never silently broaden permissions.

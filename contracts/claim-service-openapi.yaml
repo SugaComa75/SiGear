@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
   title: SiGear Sandbox Claim Service
-  version: 1.2.0
-  description: Single-use Avatar claim, one-Avatar Personal view, and multi-Avatar Family Hub API used by the file-deployable sandbox website.
+  version: 1.6.0
+  description: Passkey-bound adult Avatar issuance, standalone Personal accounts, legacy single-use Avatar claims, encrypted private profiles, optional Family Hubs, and Guardian relationship enforcement for the file-deployable sandbox website.
 servers:
   - url: /api/index.php?route=
     description: Same-origin PHP entry point; append the URL-encoded route value.
@@ -13,6 +13,157 @@ paths:
       responses:
         '200':
           description: Service is ready
+  /v2/adult-mints:
+    post:
+      summary: Start a provisional adult Avatar mint after simulated sandbox proofing
+      description: Guardian and Explorer are accepted. Companion self-minting is rejected because it requires an authorised Guardian or approved issuer.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdultMintRequest'
+      responses:
+        '201':
+          description: Provisional mint created; no Avatar has been issued yet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdultMintTransaction'
+        '403':
+          description: Companion issuance requires a Guardian or approved issuer
+        '429':
+          description: Mint rate limit exceeded
+  /v2/adult-mints/{token}/passkey/options:
+    post:
+      summary: Create passkey registration options for a provisional adult mint
+      parameters:
+        - $ref: '#/components/parameters/MintToken'
+      responses:
+        '200':
+          description: WebAuthn PublicKeyCredentialCreationOptions and challenge identifier
+        '409':
+          description: Mint is already issued or cannot continue
+        '410':
+          description: Provisional mint expired
+  /v2/adult-mints/{token}/passkey/verify:
+    post:
+      summary: Verify the passkey and issue the adult Avatar and standalone Personal account
+      parameters:
+        - $ref: '#/components/parameters/MintToken'
+      responses:
+        '201':
+          description: Avatar and Personal account issued; HttpOnly Personal session cookie set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdultMintResult'
+  /v2/personal/authentication/options:
+    post:
+      summary: Create passkey assertion options for one standalone Personal Avatar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [avatar_id]
+              properties:
+                avatar_id:
+                  type: string
+                  pattern: '^avatar-[A-Za-z0-9-]{20,80}$'
+      responses:
+        '200':
+          description: WebAuthn PublicKeyCredentialRequestOptions and challenge identifier
+        '404':
+          description: Personal account not found
+  /v2/personal/authentication/verify:
+    post:
+      summary: Verify a standalone Avatar passkey and start a Personal session
+      responses:
+        '200':
+          description: Passkey verified and HttpOnly Personal session cookie set
+  /v2/personal/me:
+    get:
+      summary: Return the single Avatar authenticated for the standalone Personal session
+      responses:
+        '200':
+          description: Authenticated Avatar, preferences, and optional Family Hub link
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalAccountView'
+        '401':
+          description: Personal passkey session required
+      security:
+        - PasskeySessionCookie: []
+  /v2/personal/preferences:
+    put:
+      summary: Replace the authenticated adult Avatar's standalone Personal preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreferenceUpdate'
+      responses:
+        '200':
+          description: Personal preferences saved
+        '401':
+          description: Personal passkey session required
+        '403':
+          description: Companion preferences require the linked Guardian
+      security:
+        - PasskeySessionCookie: []
+  /v2/personal/profile:
+    get:
+      summary: Read the authenticated adult Avatar's encrypted-at-rest private profile
+      description: Returns private fields only to the Avatar's passkey session. The accompanying site preview excludes name, exact date of birth, contact information, and address.
+      responses:
+        '200':
+          description: Private profile, data-minimised site preview, and self-access decision
+        '401':
+          description: Personal passkey session required
+      security:
+        - PasskeySessionCookie: []
+  /v2/site-access/evaluate:
+    post:
+      summary: Evaluate a destination-site capability against the authenticated Avatar policy
+      description: Returns a raw data-minimised decision packet. It never returns private name, exact date of birth, address, contact details, or credential material.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [site_id, action]
+              properties:
+                site_id: {const: harbour-community-test}
+                action:
+                  type: string
+                  enum: [chat_room, private_message, age_restricted_content, post_to_page]
+      responses:
+        '200':
+          description: Granted or denied decision plus the exact information disclosed to the destination
+        '400':
+          description: Unknown destination or unsupported capability
+        '401':
+          description: Personal passkey session required
+      security:
+        - PasskeySessionCookie: []
+    put:
+      summary: Replace the authenticated adult Avatar's private profile and site permissions
+      responses:
+        '200':
+          description: Profile validated, encrypted, and saved
+        '400':
+          description: Invalid profile, or chat requested without an age-16 result and site handle
+        '401':
+          description: Personal passkey session required
+        '403':
+          description: Companion profile requires its linked Guardian
+      security:
+        - PasskeySessionCookie: []
   /v1/mint:
     post:
       summary: Mint a sandbox Avatar and create a 15-minute single-use claim
@@ -77,6 +228,7 @@ paths:
         '409':
           description: Claim used or Avatar already bound
       security:
+        - PasskeySessionCookie: []
         - HubIdHeader: []
           DeviceIdHeader: []
           DeviceTokenHeader: []
@@ -92,6 +244,40 @@ paths:
       responses:
         '201':
           description: Hub upgraded and first device credential created
+  /v1/webauthn/registration/options:
+    post:
+      summary: Create Avatar-bound WebAuthn registration options for an authorised device
+      responses:
+        '200':
+          description: WebAuthn PublicKeyCredentialCreationOptions and challenge identifier
+      security:
+        - PasskeySessionCookie: []
+        - HubIdHeader: []
+          DeviceIdHeader: []
+          DeviceTokenHeader: []
+  /v1/webauthn/registration/verify:
+    post:
+      summary: Verify and store an ES256 passkey registration and start a secure session
+      responses:
+        '201':
+          description: Passkey registered and HttpOnly session cookie issued
+      security:
+        - PasskeySessionCookie: []
+        - HubIdHeader: []
+          DeviceIdHeader: []
+          DeviceTokenHeader: []
+  /v1/webauthn/authentication/options:
+    post:
+      summary: Create single-use WebAuthn assertion options for an enrolled Avatar credential on a device
+      responses:
+        '200':
+          description: WebAuthn PublicKeyCredentialRequestOptions and challenge identifier
+  /v1/webauthn/authentication/verify:
+    post:
+      summary: Verify an ES256 WebAuthn assertion and start a secure session
+      responses:
+        '200':
+          description: Assertion verified and HttpOnly session cookie issued
   /v1/hubs/{hub_id}/members:
     get:
       summary: Synchronise active Avatar members and preferences to an authorised device
@@ -99,8 +285,9 @@ paths:
         - $ref: '#/components/parameters/HubId'
       responses:
         '200':
-          description: Family Hub member list, including this device's one personal_avatar_id
+          description: Family Hub membership plus the Avatar authenticated by the current passkey session, if any
       security:
+        - PasskeySessionCookie: []
         - HubIdHeader: []
           DeviceIdHeader: []
           DeviceTokenHeader: []
@@ -113,29 +300,30 @@ paths:
         '201':
           description: Pairing invitation created
       security:
+        - PasskeySessionCookie: []
         - HubIdHeader: []
           DeviceIdHeader: []
           DeviceTokenHeader: []
   /v1/devices/personal-avatar:
     put:
-      summary: Select the one Family Hub Avatar shown in Personal on this authorised device
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [avatar_id]
-              properties:
-                avatar_id:
-                  type: string
-                  pattern: '^avatar-[A-Za-z0-9-]{20,80}$'
+      deprecated: true
+      summary: Retired device-based Personal selection endpoint
+      responses:
+        '410':
+          description: Personal identity must be changed by authenticating with that Avatar's passkey
+      security:
+        - PasskeySessionCookie: []
+        - HubIdHeader: []
+          DeviceIdHeader: []
+          DeviceTokenHeader: []
+  /v1/personal:
+    get:
+      summary: Return only the Avatar authenticated for the current Personal session
       responses:
         '200':
-          description: Device personal Avatar selection saved
-        '403':
-          description: Avatar is not an active member of this Family Hub
+          description: One authenticated Avatar, or no member data when no Avatar passkey session is active
       security:
+        - PasskeySessionCookie: []
         - HubIdHeader: []
           DeviceIdHeader: []
           DeviceTokenHeader: []
@@ -172,9 +360,36 @@ paths:
         '401':
           description: Invalid binding credentials
       security:
-        - HubIdHeader: []
-          DeviceIdHeader: []
-          DeviceTokenHeader: []
+        - PasskeySessionCookie: []
+  /v1/bindings/{avatar_id}/profile:
+    get:
+      summary: Read an authorised Avatar private profile after passkey verification
+      parameters:
+        - $ref: '#/components/parameters/AvatarId'
+      responses:
+        '200':
+          description: Encrypted-at-rest private profile plus a data-minimised site claim preview
+        '401':
+          description: Fresh passkey session required
+        '403':
+          description: Avatar profile is outside the current role scope
+      security:
+        - PasskeySessionCookie: []
+    put:
+      summary: Replace an authorised Avatar private profile and granular permissions
+      parameters:
+        - $ref: '#/components/parameters/AvatarId'
+      responses:
+        '200':
+          description: Profile encrypted and saved; exact DOB remains private and sites receive only an age predicate
+        '400':
+          description: Invalid profile or chat requested without verified age 16+
+        '401':
+          description: Fresh passkey session required
+        '403':
+          description: Profile is read-only for the current Avatar role
+      security:
+        - PasskeySessionCookie: []
   /v1/bindings/{avatar_id}/release:
     post:
       summary: Release an Avatar from its active Family Hub
@@ -192,11 +407,13 @@ paths:
         '401':
           description: Invalid binding credentials
       security:
-        - HubIdHeader: []
-          DeviceIdHeader: []
-          DeviceTokenHeader: []
+        - PasskeySessionCookie: []
 components:
   securitySchemes:
+    PasskeySessionCookie:
+      type: apiKey
+      in: cookie
+      name: sigear_session
     HubIdHeader:
       type: apiKey
       in: header
@@ -211,6 +428,13 @@ components:
       name: X-SiGear-Device-Token
   parameters:
     ClaimToken:
+      name: token
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^[A-Za-z0-9_-]{20,128}$'
+    MintToken:
       name: token
       in: path
       required: true
@@ -258,6 +482,34 @@ components:
         avatar: {type: string, enum: [guardian, explorer, companion]}
         proofing_tier: {type: string, enum: [low, medium]}
         public_key_jwk: {$ref: '#/components/schemas/PublicKeyJwk'}
+    AdultMintRequest:
+      type: object
+      required: [display_name, avatar, proofing_tier]
+      properties:
+        display_name: {type: string, minLength: 1, maxLength: 40}
+        avatar: {type: string, enum: [guardian, explorer]}
+        proofing_tier: {type: string, enum: [low, medium]}
+    AdultMintTransaction:
+      type: object
+      required: [status, mint_token, transaction_id, avatar_id, display_name, avatar, proofing_simulated, expires_at]
+      properties:
+        status: {const: provisional}
+        mint_token: {type: string, writeOnly: true}
+        transaction_id: {type: string}
+        avatar_id: {type: string}
+        display_name: {type: string}
+        avatar: {type: string, enum: [guardian, explorer]}
+        proofing_simulated: {const: true}
+        expires_at: {type: string, format: date-time}
+    AdultMintResult:
+      type: object
+      required: [status, identity, personal_account_id, credential_id, session_expires_in]
+      properties:
+        status: {const: issued}
+        identity: {$ref: '#/components/schemas/PublicIdentity'}
+        personal_account_id: {type: string}
+        credential_id: {type: string}
+        session_expires_in: {type: integer}
     MintResult:
       type: object
       required: [claim_token, claim_id, nti_id, avatar_id, display_name, expires_at]
@@ -302,6 +554,22 @@ components:
       required: [preferences]
       properties:
         preferences: {$ref: '#/components/schemas/Preferences'}
+    PersonalAccountView:
+      type: object
+      required: [authenticated_avatar_id, personal_account_id, member, authenticated_with, synced_at]
+      properties:
+        authenticated_avatar_id: {type: string}
+        personal_account_id: {type: string}
+        member:
+          type: object
+          properties:
+            identity: {$ref: '#/components/schemas/PublicIdentity'}
+            preferences: {$ref: '#/components/schemas/Preferences'}
+            binding_status: {const: active}
+            bound_at: {type: [string, 'null'], format: date-time}
+        family_hub_id: {type: [string, 'null']}
+        authenticated_with: {const: webauthn}
+        synced_at: {type: string, format: date-time}
     BindingResult:
       type: object
       properties:
